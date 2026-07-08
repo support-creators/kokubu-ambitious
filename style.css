@@ -1,0 +1,380 @@
+/* ============================================
+   国分アンビシャス広場 共通スタイル v2
+   コンセプト：赤×黒の「新聞」デザイン
+============================================ */
+:root {
+  --ink: #14130F;
+  --paper: #F7F4EC;
+  --white: #FFFFFF;
+  --red: #C7231E;
+  --red-deep: #9E1815;
+  --gray: #6E6C66;
+  --line-thin: rgba(20,19,15,0.14);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Sans JP', sans-serif;
+  line-height: 1.9;
+  /* 和紙のような繊細な質感 */
+  background-image: radial-gradient(rgba(20,19,15,0.025) 1px, transparent 1px);
+  background-size: 5px 5px;
+}
+h1,h2,h3 { font-family: 'Shippori Mincho', serif; margin: 0; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+img { max-width: 100%; }
+
+/* ===== 題字（黒帯） ===== */
+.masthead {
+  background: var(--ink);
+  color: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+.masthead .inner {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 52px 24px 46px;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+/* 朱印風ロゴ */
+.seal {
+  width: 74px;
+  height: 74px;
+  border: 3px solid var(--red);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--red);
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1.15;
+  text-align: center;
+  transform: rotate(-6deg);
+}
+.masthead h1 {
+  font-size: clamp(30px, 6vw, 56px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.25;
+}
+.masthead .sub {
+  margin-top: 12px;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  color: rgba(247,244,236,0.65);
+}
+/* 縦書きスローガン */
+.slogan-v {
+  margin-left: auto;
+  writing-mode: vertical-rl;
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.32em;
+  color: var(--red);
+  border-left: 1px solid rgba(247,244,236,0.25);
+  padding-left: 22px;
+  height: 150px;
+}
+/* 背景の大きな飾り文字 */
+.masthead::after {
+  content: "遊";
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 280px;
+  font-weight: 800;
+  color: rgba(247,244,236,0.045);
+  pointer-events: none;
+  line-height: 1;
+}
+@media(max-width:720px){
+  .masthead .inner { padding: 36px 20px 32px; gap: 20px; }
+  .slogan-v { display: none; }
+  .seal { width: 58px; height: 58px; font-size: 19px; }
+}
+
+/* ===== ナビ（スティッキー） ===== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--paper);
+  border-bottom: 2px solid var(--ink);
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 10px rgba(20,19,15,0.06);
+}
+.navbar a {
+  display: block;
+  padding: 14px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  color: var(--ink);
+  position: relative;
+  transition: color 0.2s;
+}
+.navbar a::after {
+  content: "";
+  position: absolute;
+  left: 22px; right: 22px; bottom: 8px;
+  height: 3px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s;
+}
+.navbar a:hover::after, .navbar a.current::after { transform: scaleX(1); }
+.navbar a.current { color: var(--red); }
+.navbar a.yt { color: var(--red); }
+@media(max-width:720px){
+  .navbar a { padding: 12px 13px; font-size: 13px; }
+}
+
+/* ===== リード文 ===== */
+.lead {
+  text-align: center;
+  padding: 60px 24px 52px;
+}
+.lead .catch {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(20px, 3.6vw, 30px);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin-bottom: 18px;
+}
+.lead .catch .accent { color: var(--red); }
+.lead p { max-width: 580px; margin: 0 auto; font-size: 15px; color: rgba(20,19,15,0.8); }
+
+/* ===== セクション ===== */
+.section { padding: 64px 0 72px; }
+.section.alt { background: var(--white); border-top: 1px solid var(--line-thin); border-bottom: 1px solid var(--line-thin); }
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  margin-bottom: 34px;
+}
+.sec-head .num {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--red);
+  letter-spacing: 0.1em;
+  border-bottom: 3px solid var(--red);
+  padding-bottom: 4px;
+}
+.sec-head h2 {
+  font-size: clamp(24px, 3.4vw, 32px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.sec-head .meta { margin-left: auto; font-size: 13px; color: var(--gray); }
+
+/* ===== 最新号 ===== */
+.latest-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+.issue-frame {
+  border: 1px solid var(--ink);
+  padding: 12px;
+  background: var(--white);
+  box-shadow: 10px 10px 0 var(--red);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.issue-frame:hover { transform: translate(-2px,-2px); box-shadow: 14px 14px 0 var(--red); }
+.issue-frame img { width: 100%; display: block; }
+
+/* ===== YouTubeバナー ===== */
+.yt-banner {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 56px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.yt-banner::before {
+  content: "▶";
+  position: absolute;
+  left: 4%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 150px;
+  color: rgba(199,35,30,0.14);
+  pointer-events: none;
+}
+.yt-banner h2 { font-size: 24px; margin-bottom: 10px; letter-spacing: 0.08em; }
+.yt-banner p { font-size: 14px; color: rgba(247,244,236,0.7); margin: 0 0 24px; }
+.yt-btn {
+  display: inline-block;
+  background: var(--red);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  padding: 15px 44px;
+  transition: background 0.2s, transform 0.2s;
+}
+.yt-btn:hover { background: var(--red-deep); transform: translateY(-2px); }
+
+/* ===== バックナンバー（サムネイルグリッド） ===== */
+.bn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 26px;
+}
+.bn-item {
+  text-decoration: none;
+  color: var(--ink);
+  display: block;
+  group: bn;
+}
+.bn-item .thumb {
+  border: 1px solid var(--ink);
+  background: var(--white);
+  padding: 7px;
+  aspect-ratio: 210/297;
+  overflow: hidden;
+  box-shadow: 5px 5px 0 rgba(20,19,15,0.12);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.bn-item:hover .thumb {
+  transform: translate(-2px,-2px);
+  box-shadow: 8px 8px 0 var(--red);
+}
+.bn-item .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+.bn-item .cap {
+  margin-top: 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.bn-item .no {
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--red);
+}
+.bn-item .date { font-size: 13px; color: var(--gray); }
+.bn-note { margin-top: 26px; font-size: 13px; color: var(--gray); }
+
+/* ===== 本文記事（下層ページ） ===== */
+.article { font-size: 15px; max-width: 760px; }
+.article h3 {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 46px 0 16px;
+  padding-left: 16px;
+  border-left: 5px solid var(--red);
+  letter-spacing: 0.05em;
+}
+.article h3:first-child { margin-top: 0; }
+.article p { margin: 0 0 16px; }
+.article ul, .article ol { margin: 0 0 16px; padding-left: 24px; }
+.article li { margin-bottom: 7px; }
+.article .note { font-size: 13px; color: var(--gray); }
+.article .box {
+  border: 1px solid var(--ink);
+  background: var(--white);
+  padding: 24px 28px;
+  margin: 0 0 22px;
+  box-shadow: 5px 5px 0 rgba(20,19,15,0.1);
+}
+.article .box .box-title {
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 800;
+  color: var(--red);
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+.article .quote-src { font-size: 13px; color: var(--gray); text-align: right; margin-top: -6px; }
+
+/* ===== 開催情報テーブル ===== */
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--ink);
+  background: var(--white);
+  font-size: 14px;
+  margin-bottom: 20px;
+  box-shadow: 5px 5px 0 rgba(20,19,15,0.1);
+}
+.info-table th {
+  font-family: 'Shippori Mincho', serif;
+  text-align: left;
+  padding: 15px 22px;
+  border-bottom: 1px solid var(--line-thin);
+  border-right: 1px solid var(--line-thin);
+  width: 30%;
+  vertical-align: top;
+  background: rgba(199,35,30,0.05);
+  font-weight: 800;
+}
+.info-table td { padding: 15px 22px; border-bottom: 1px solid var(--line-thin); }
+.info-table tr:last-child th, .info-table tr:last-child td { border-bottom: none; }
+
+/* ===== 場所カード ===== */
+.place-card {
+  border: 1px solid var(--ink);
+  background: var(--white);
+  padding: 30px 34px;
+  box-shadow: 8px 8px 0 rgba(20,19,15,0.1);
+  font-size: 15px;
+}
+.place-card .label {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--red);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.place-card .name { font-family: 'Shippori Mincho', serif; font-weight: 800; font-size: 19px; margin-bottom: 4px; }
+
+/* ===== テキストリンク・戻る ===== */
+.textlink { color: var(--red); font-weight: 700; }
+.backlink {
+  display: inline-block;
+  margin-top: 36px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--paper);
+  background: var(--ink);
+  text-decoration: none;
+  padding: 12px 32px;
+  transition: background 0.2s;
+}
+.backlink:hover { background: var(--red); }
+
+footer {
+  background: var(--ink);
+  color: rgba(247,244,236,0.6);
+  text-align: center;
+  font-size: 12px;
+  padding: 30px 24px 42px;
+  letter-spacing: 0.05em;
+}
