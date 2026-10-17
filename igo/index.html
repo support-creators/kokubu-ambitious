@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>国分アンビシャス囲碁アプリ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbf6ea; --ink:#3b2f22; --sub:#7a6a55; --card:#fffdf7; --line:#e8dcc4;
+  --accent:#2f8f5b; --accent-ink:#fff; --warn:#d9534f; --gold:#e0a526;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:12px 16px 32px}
+header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.logo{width:40px;height:40px;flex:none}
+h1{font-size:18px;line-height:1.25;margin:0;font-weight:800;flex:1;min-width:0;white-space:nowrap}
+@media (max-width:420px){h1{font-size:15px}}
+h1 small{display:block;font-size:12px;color:var(--sub);font-weight:500}
+.who{border:0;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
+.screen{display:none}.screen.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.label{font-size:12px;color:var(--sub);margin:0 0 6px}
+.btn{border:0;border-radius:14px;padding:14px 8px;font-weight:800;font-size:15px;cursor:pointer;background:#efe4cc;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn.main{background:var(--accent);color:var(--accent-ink)}
+.btn.big{width:100%;font-size:18px;padding:18px}
+.btn[hidden]{display:none}
+ruby rt{font-size:.5em;font-weight:500}
+/* 名前えらび */
+.kids{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.kid{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:16px 12px;text-align:center;cursor:pointer;position:relative}
+.kid .nm{font-size:20px;font-weight:800;word-break:break-all}
+.kid .lv{font-size:14px;color:var(--accent);font-weight:800;margin-top:4px}
+.kid .del{position:absolute;top:6px;right:6px;border:0;background:#fde8e6;color:var(--warn);border-radius:10px;font-size:12px;padding:4px 8px;cursor:pointer}
+.kid.add{border-style:dashed;white-space:nowrap;font-size:15px;color:var(--sub);display:flex;align-items:center;justify-content:center;font-weight:800;min-height:96px}
+.row{display:flex;gap:8px}
+.row input{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:17px;background:#fff}
+/* メニュー */
+.level{text-align:center;padding:22px 14px}
+.level .now{font-size:13px;color:var(--sub)}
+.level .big{font-size:52px;font-weight:800;line-height:1.1;margin:4px 0}
+.level .theme{display:inline-block;background:#e3f4ea;color:var(--accent);font-weight:800;border-radius:999px;padding:6px 14px;font-size:14px}
+.ladder{display:flex;gap:3px;margin-top:14px}
+.ladder i{flex:1;height:8px;border-radius:4px;background:#eadfc8}
+.ladder i.done{background:var(--accent)}
+.ladder i.cur{background:var(--gold)}
+.menu{display:grid;gap:10px}
+/* 盤と横パネル */
+.play{display:flex;flex-direction:column;gap:12px}
+@media (min-width:820px){.play{flex-direction:row;align-items:flex-start}.side{width:300px;flex:none}}
+.boardbox{flex:1;min-width:0}
+.boardcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:8px}
+svg.board{display:block;width:100%;height:auto;touch-action:manipulation;user-select:none}
+.side{display:flex;flex-direction:column;gap:12px}
+.qhead{display:flex;justify-content:space-between;align-items:center;font-weight:800}
+.dots{display:flex;gap:5px;margin-top:10px}
+.dots i{flex:1;height:10px;border-radius:5px;background:#eadfc8}
+.dots i.ok{background:var(--accent)}.dots i.ng{background:#e9a19d}.dots i.cur{outline:2px solid var(--gold)}
+.qtitle{font-size:20px;font-weight:800;margin:10px 0 2px}
+.qturn{font-size:13px;color:var(--sub)}
+.msg{min-height:48px;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:14px;padding:8px 12px;font-weight:800;font-size:15px;background:var(--card);border:1px solid var(--line);color:var(--sub)}
+.msg.warn{background:#fde8e6;border-color:#f6c9c5;color:var(--warn)}
+.msg.good{background:#e3f4ea;border-color:#bfe3cd;color:var(--accent)}
+.msg.hint{background:#fff6dc;border-color:#f1dfa6;color:#8a6500}
+.btns{display:flex;gap:8px}.btns .btn{flex:1}.btns[hidden]{display:none}
+.seg{display:flex;background:var(--bg);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:transparent;border-radius:10px;padding:10px 0;font-weight:800;color:var(--sub);cursor:pointer}
+.seg button.on{background:var(--accent);color:var(--accent-ink)}
+.caps{display:flex;gap:8px}
+.cap{flex:1;background:var(--bg);border-radius:12px;padding:8px;text-align:center;font-size:12px;color:var(--sub)}
+.cap b{display:block;font-size:22px;color:var(--ink)}
+.turn{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin-bottom:10px}
+.st{width:26px;height:26px;border-radius:50%;flex:none}
+.st.b{background:radial-gradient(circle at 35% 30%,#666,#111 60%)}
+.st.w{background:radial-gradient(circle at 35% 30%,#fff,#ddd 70%);border:1px solid #bbb}
+/* 結果・認定証 */
+.result{text-align:center}
+.score{font-size:56px;font-weight:800;margin:6px 0}
+.score small{font-size:22px;color:var(--sub)}
+.stars{font-size:30px;letter-spacing:4px;color:var(--gold)}
+.cert{position:relative;max-width:520px;margin:0 auto;background:#fffaf0;border-radius:18px;padding:30px 22px;text-align:center;
+  border:3px double var(--gold);box-shadow:0 0 0 8px #fffaf0,0 0 0 10px #ecd9a8}
+.cert h2{font-size:28px;letter-spacing:.3em;margin:0 0 18px;color:#8a6500}
+.cert .nm{font-size:26px;font-weight:800}
+.cert .lv{font-size:58px;font-weight:800;color:var(--accent);line-height:1.1;margin:10px 0}
+.cert p{margin:6px 0;line-height:1.7}
+.cert .from{margin-top:18px;font-size:14px;color:var(--sub)}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.note{font-size:12px;color:var(--sub);line-height:1.6;text-align:center}
+.picks{display:grid;gap:10px}
+.pick{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--card);border-radius:18px;padding:14px;cursor:pointer;text-align:left;width:100%}
+.pick .ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
+.pick .nm{font-size:19px;font-weight:800}
+.pick .sb{font-size:12px;color:var(--sub);margin-top:2px}
+.pick.lock{opacity:.5;cursor:default}
+.think{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--sub);margin-left:6px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.2}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg class="logo" viewBox="0 0 40 40" aria-hidden="true">
+      <rect width="40" height="40" rx="10" fill="#e6bf73"/>
+      <path d="M8 14h24M8 26h24M14 8v24M26 8v24" stroke="#5a4020" stroke-width="1.5"/>
+      <circle cx="14" cy="14" r="5.5" fill="#222"/><circle cx="26" cy="26" r="5.5" fill="#fff" stroke="#999"/>
+    </svg>
+    <h1>国分アンビシャス囲碁アプリ<small>テスト版</small></h1>
+    <button class="who" id="whoBtn" hidden></button>
+  </header>
+
+  <!-- 名前えらび -->
+  <section class="screen" id="sKids">
+    <div class="stack">
+      <div class="card">
+        <p class="label">だれが やる？</p>
+        <div class="kids" id="kidList"></div>
+      </div>
+      <div class="card" id="addBox" hidden>
+        <p class="label">なまえ（きょうしつでの よびな）</p>
+        <div class="row"><input id="nameIn" maxlength="10" placeholder="れい：はると"><button class="btn main" id="addOk">ついか</button></div>
+      </div>
+      <p class="note">きろくは この スマホの なかに のこります。</p>
+    </div>
+  </section>
+
+  <!-- メニュー -->
+  <section class="screen" id="sMenu">
+    <div class="stack" style="max-width:560px;margin:0 auto">
+      <div class="card level">
+        <div class="now" id="mName"></div>
+        <div class="big" id="mLevel"></div>
+        <div class="theme" id="mTheme"></div>
+        <div class="ladder" id="ladder"></div>
+      </div>
+      <div class="menu">
+        <button class="btn main big" id="goQuiz">もんだいを とく</button>
+        <button class="btn big" id="goCpu">コンピュータと うつ（9ろ）</button>
+        <button class="btn big" id="goFree">じゆうに うつ</button>
+      </div>
+      <p class="note" id="mInfo"></p>
+    </div>
+  </section>
+
+  <!-- もんだい -->
+  <section class="screen" id="sQuiz">
+    <div class="play">
+      <div class="boardbox"><div class="boardcard"><svg class="board" id="qBoard"></svg></div></div>
+      <div class="side">
+        <div class="card">
+          <div class="qhead"><span id="qLv"></span><span id="qNo"></span></div>
+          <div class="dots" id="qDots"></div>
+          <div class="qtitle" id="qTitle"></div>
+          <div class="qturn" id="qTurn"></div>
+        </div>
+        <div class="msg" id="qMsg"></div>
+        <div class="card"><div class="btns">
+          <button class="btn" id="qHint">ヒント</button>
+          <button class="btn" id="qRetry">やりなおし</button>
+          <button class="btn main" id="qNext">つぎへ</button>
+        </div></div>
+        <button class="btn" id="qQuit">やめる</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- けっか -->
+  <section class="screen" id="sResult">
+    <div class="card result" style="max-width:520px;margin:0 auto">
+      <div class="label" id="rLv"></div>
+      <div class="score" id="rScore"></div>
+      <div class="stars" id="rStars"></div>
+      <p id="rMsg" style="font-weight:800;font-size:17px"></p>
+      <div class="stack">
+        <button class="btn main big" id="rAgain"></button>
+        <button class="btn big" id="rMenu">メニューへ</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- にんていしょう -->
+  <section class="screen" id="sCert">
+    <div class="stack">
+      <div class="cert">
+        <h2>にんていしょう</h2>
+        <div class="nm" id="cName"></div>
+        <div class="lv" id="cLevel"></div>
+        <p>よく がんばりました。<br>ここに みとめます。</p>
+        <p class="from" id="cDate"></p>
+      </div>
+      <button class="btn main big" id="cOk" style="max-width:520px;margin:0 auto">つぎの きゅうへ</button>
+    </div>
+  </section>
+
+  <!-- コンピュータと うつ -->
+  <section class="screen" id="sCpuPick">
+    <div class="stack" style="max-width:560px;margin:0 auto">
+      <div class="card"><p class="label">あいての つよさを えらんでね（あなたは くろ）</p><div class="picks" id="picks"></div></div>
+      <button class="btn big" id="cpBack">メニューへ</button>
+    </div>
+  </section>
+  <section class="screen" id="sCpu">
+    <div class="play">
+      <div class="boardbox"><div class="boardcard"><svg class="board" id="cBoard"></svg></div></div>
+      <div class="side">
+        <div class="card">
+          <div class="turn"><span class="st b" id="cStone"></span><span id="cTurn"></span></div>
+          <div class="caps"><div class="cap">あなたが とった石<b id="cCapB">0</b></div><div class="cap">コンピュータが とった石<b id="cCapW">0</b></div></div>
+        </div>
+        <div class="msg" id="cMsg"></div>
+        <div class="card"><div class="btns" id="cPlayBtns">
+          <button class="btn" id="cUndo">まった</button>
+          <button class="btn" id="cPass">パス</button>
+          <button class="btn main" id="cCount">かぞえる</button>
+        </div><div class="btns" id="cEndBtns" hidden>
+          <button class="btn main" id="cAgain">もういちど</button>
+          <button class="btn" id="cOther">つよさを かえる</button>
+        </div></div>
+        <button class="btn" id="cQuit">やめる</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- じゆうに うつ -->
+  <section class="screen" id="sFree">
+    <div class="play">
+      <div class="boardbox"><div class="boardcard"><svg class="board" id="fBoard"></svg></div></div>
+      <div class="side">
+        <div class="card">
+          <div class="turn"><span class="st b" id="fStone"></span><span id="fTurn"></span></div>
+          <div class="caps"><div class="cap">くろが とった石<b id="fCapB">0</b></div><div class="cap">しろが とった石<b id="fCapW">0</b></div></div>
+        </div>
+        <div class="msg" id="fMsg"></div>
+        <div class="card"><div class="btns">
+          <button class="btn" id="fUndo">まった</button>
+          <button class="btn" id="fPass">パス</button>
+          <button class="btn main" id="fReset">はじめから</button>
+        </div></div>
+        <div class="card">
+          <p class="label">ごばんの おおきさ</p>
+          <div class="seg" id="fSize"><button data-s="9" class="on">9ろ</button><button data-s="13">13ろ</button><button data-s="19">19ろ</button></div>
+        </div>
+        <button class="btn" id="fBack">メニューへ</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// 国分アンビシャス囲碁アプリ — ルールエンジン
+// 盤面: 0=空, 1=黒, 2=白
+const GoEngine = (() => {
+  const EMPTY = 0, BLACK = 1, WHITE = 2;
+  const other = c => (c === BLACK ? WHITE : BLACK);
+
+  class Board {
+    constructor(size = 9) {
+      this.size = size;
+      this.grid = new Int8Array(size * size);
+      this.ko = -1;          // コウで打てない点
+      this.turn = BLACK;
+      this.captures = { [BLACK]: 0, [WHITE]: 0 }; // 取った石の数
+      this.history = [];     // まった用
+      this.lastMove = -1;
+      this.passes = 0;
+    }
+    idx(x, y) { return y * this.size + x; }
+    xy(i) { return [i % this.size, Math.floor(i / this.size)]; }
+    get(i) { return this.grid[i]; }
+    neighbors(i) {
+      const s = this.size, x = i % s, y = (i / s) | 0, n = [];
+      if (x > 0) n.push(i - 1);
+      if (x < s - 1) n.push(i + 1);
+      if (y > 0) n.push(i - s);
+      if (y < s - 1) n.push(i + s);
+      return n;
+    }
+    // つながった石とダメ（呼吸点）
+    group(i) {
+      const color = this.grid[i];
+      const stones = [], libs = new Set(), seen = new Set([i]);
+      const stack = [i];
+      while (stack.length) {
+        const p = stack.pop();
+        stones.push(p);
+        for (const q of this.neighbors(p)) {
+          const c = this.grid[q];
+          if (c === EMPTY) libs.add(q);
+          else if (c === color && !seen.has(q)) { seen.add(q); stack.push(q); }
+        }
+      }
+      return { color, stones, libs };
+    }
+    snapshot() {
+      return { grid: this.grid.slice(), ko: this.ko, turn: this.turn,
+        captures: { ...this.captures }, lastMove: this.lastMove, passes: this.passes };
+    }
+    restore(s) {
+      this.grid = s.grid.slice(); this.ko = s.ko; this.turn = s.turn;
+      this.captures = { ...s.captures }; this.lastMove = s.lastMove; this.passes = s.passes;
+    }
+    // 打てるか確認だけ（盤面は変えない）
+    check(i, color = this.turn) {
+      if (i < 0 || i >= this.grid.length) return { ok: false, reason: 'outside' };
+      if (this.grid[i] !== EMPTY) return { ok: false, reason: 'occupied' };
+      if (i === this.ko) return { ok: false, reason: 'ko' };
+      const s = this.snapshot();
+      const r = this._place(i, color);
+      this.restore(s);
+      return r;
+    }
+    _place(i, color) {
+      this.grid[i] = color;
+      const captured = [];
+      for (const q of this.neighbors(i)) {
+        if (this.grid[q] === other(color)) {
+          const g = this.group(q);
+          if (g.libs.size === 0) for (const st of g.stones) {
+            if (this.grid[st] !== EMPTY) { this.grid[st] = EMPTY; captured.push(st); }
+          }
+        }
+      }
+      const mine = this.group(i);
+      if (mine.libs.size === 0) { this.grid[i] = EMPTY; return { ok: false, reason: 'suicide' }; }
+      // 単純コウ: 1子取りで、打った石が1子・ダメ1つ
+      this.ko = (captured.length === 1 && mine.stones.length === 1 && mine.libs.size === 1)
+        ? captured[0] : -1;
+      this.captures[color] += captured.length;
+      return { ok: true, captured };
+    }
+    play(i, color = this.turn) {
+      const c = this.check(i, color);
+      if (!c.ok) return c;
+      this.history.push(this.snapshot());
+      const r = this._place(i, color);
+      this.lastMove = i; this.turn = other(color); this.passes = 0;
+      return r;
+    }
+    pass() {
+      this.history.push(this.snapshot());
+      this.ko = -1; this.lastMove = -1; this.turn = other(this.turn); this.passes++;
+    }
+    undo() {
+      if (!this.history.length) return false;
+      this.restore(this.history.pop());
+      return true;
+    }
+    // アタリ（ダメ1つ）の石の一覧
+    atariStones() {
+      const res = new Set(), seen = new Set();
+      for (let i = 0; i < this.grid.length; i++) {
+        if (this.grid[i] === EMPTY || seen.has(i)) continue;
+        const g = this.group(i);
+        g.stones.forEach(s => seen.add(s));
+        if (g.libs.size === 1) g.stones.forEach(s => res.add(s));
+      }
+      return res;
+    }
+  }
+  return { Board, EMPTY, BLACK, WHITE, other };
+})();
+if (typeof module !== 'undefined') module.exports = GoEngine;
+
+</script>
+<script>
+// 国分アンビシャス囲碁アプリ — 盤の表示・共通部品（app と make で共用）
+const SVGNS = 'http://www.w3.org/2000/svg';
+function starPoints(n) {
+  if (n === 9) return [[2, 2], [2, 6], [6, 2], [6, 6], [4, 4]];
+  const a = 3, b = n - 4, c = (n - 1) / 2;
+  return n === 13 ? [[a, a], [a, b], [b, a], [b, b], [c, c]]
+    : [[a, a], [a, b], [b, a], [b, b], [c, c], [a, c], [c, a], [b, c], [c, b]];
+}
+function fullView(n) { return { x0: 0, y0: 0, x1: n - 1, y1: n - 1 }; }
+// 石と答えの まわりだけを 見せる（9路は ぜんぶ）
+function autoView(board, extra = []) {
+  const n = board.size; if (n <= 9) return fullView(n);
+  let x0 = n, y0 = n, x1 = -1, y1 = -1;
+  const add = i => { const [x, y] = board.xy(i); x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); };
+  for (let i = 0; i < n * n; i++) if (board.get(i)) add(i);
+  extra.forEach(add);
+  if (x1 < 0) return fullView(n);
+  x0 -= 2; y0 -= 2; x1 += 2; y1 += 2;
+  if (x0 <= 2) x0 = 0; if (y0 <= 2) y0 = 0; if (x1 >= n - 3) x1 = n - 1; if (y1 >= n - 3) y1 = n - 1;
+  const grow = (a, b) => { while (b - a < 6) { if (a > 0) a--; if (b - a < 6 && b < n - 1) b++; } return [a, b]; };
+  [x0, x1] = grow(x0, x1); [y0, y1] = grow(y0, y1);
+  return { x0, y0, x1, y1 };
+}
+function geomOf(board, view) {
+  const v = view || fullView(board.size);
+  const cols = v.x1 - v.x0 + 1, rows = v.y1 - v.y0 + 1, m = Math.max(cols, rows);
+  const cell = m <= 9 ? 44 : m <= 13 ? 32 : 24, pad = cell * .8;
+  return { v, cell, pad, Wd: pad * 2 + cell * (cols - 1), Ht: pad * 2 + cell * (rows - 1) };
+}
+function drawBoard(svg, board, opt = {}) {
+  const n = board.size, { v, cell, pad, Wd, Ht } = geomOf(board, opt.view);
+  const px = x => pad + (x - v.x0) * cell, py = y => pad + (y - v.y0) * cell;
+  const el = (t, a) => { const e = document.createElementNS(SVGNS, t); for (const k in a) e.setAttribute(k, a[k]); svg.appendChild(e); return e; };
+  const id = svg.id;
+  svg.setAttribute('viewBox', `0 0 ${Wd} ${Ht}`); svg.innerHTML = '';
+  el('defs', {}).innerHTML = `
+    <radialGradient id="${id}gb" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#6b6b6b"/><stop offset=".55" stop-color="#151515"/></radialGradient>
+    <radialGradient id="${id}gw" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset=".7" stop-color="#e4e4e4"/><stop offset="1" stop-color="#c9c9c9"/></radialGradient>
+    <linearGradient id="${id}k" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ecc77e"/><stop offset="1" stop-color="#d9a957"/></linearGradient>`;
+  el('rect', { width: Wd, height: Ht, rx: cell * .3, fill: `url(#${id}k)` });
+  const sw = Math.max(1, cell / 32);
+  const lx0 = v.x0 === 0 ? px(v.x0) : px(v.x0) - cell * .6, lx1 = v.x1 === n - 1 ? px(v.x1) : px(v.x1) + cell * .6;
+  const ly0 = v.y0 === 0 ? py(v.y0) : py(v.y0) - cell * .6, ly1 = v.y1 === n - 1 ? py(v.y1) : py(v.y1) + cell * .6;
+  for (let y = v.y0; y <= v.y1; y++) el('line', { x1: lx0, y1: py(y), x2: lx1, y2: py(y), stroke: '#5a4020', 'stroke-width': (y === 0 || y === n - 1) ? sw * 2 : sw });
+  for (let x = v.x0; x <= v.x1; x++) el('line', { x1: px(x), y1: ly0, x2: px(x), y2: ly1, stroke: '#5a4020', 'stroke-width': (x === 0 || x === n - 1) ? sw * 2 : sw });
+  starPoints(n).forEach(([x, y]) => { if (x >= v.x0 && x <= v.x1 && y >= v.y0 && y <= v.y1) el('circle', { cx: px(x), cy: py(y), r: cell * .09, fill: '#5a4020' }); });
+  const r = cell * .47, atari = opt.atari ? board.atariStones() : new Set(), labels = opt.labels || {};
+  for (let i = 0; i < n * n; i++) {
+    const c = board.get(i), [x, y] = board.xy(i);
+    if (x < v.x0 || x > v.x1 || y < v.y0 || y > v.y1) continue;
+    if (c) {
+      el('circle', { cx: px(x) + cell * .04, cy: py(y) + cell * .06, r, fill: 'rgba(0,0,0,.25)' });
+      el('circle', { cx: px(x), cy: py(y), r, fill: `url(#${id}${c === GoEngine.BLACK ? 'gb' : 'gw'})` });
+      if (atari.has(i)) el('circle', { cx: px(x), cy: py(y), r: r * 1.02, fill: 'none', stroke: '#e5483f', 'stroke-width': cell * .09 });
+      if (i === board.lastMove && labels[i] == null) el('circle', { cx: px(x), cy: py(y), r: r * .32, fill: 'none', stroke: c === GoEngine.BLACK ? '#fff' : '#222', 'stroke-width': cell * .06 });
+    }
+    if (labels[i] != null) {
+      const t = el('text', { x: px(x), y: py(y) + cell * .17, 'text-anchor': 'middle', 'font-size': cell * .46, 'font-weight': 800,
+        fill: c === GoEngine.BLACK ? '#fff' : c === GoEngine.WHITE ? '#222' : '#c0392b', 'font-family': 'sans-serif' });
+      t.textContent = labels[i];
+    }
+  }
+  if (opt.terr) for (let i = 0; i < n * n; i++) { // 地のしるし
+    const o = opt.terr[i], [x, y] = board.xy(i);
+    if (!o || (board.get(i) && !(opt.dead && opt.dead.includes(i))) || x < v.x0 || x > v.x1 || y < v.y0 || y > v.y1) continue;
+    const s = cell * .32; el('rect', { x: px(x) - s / 2, y: py(y) - s / 2, width: s, height: s, rx: s * .15, fill: o === GoEngine.BLACK ? '#1a1a1a' : '#fff', stroke: '#555', 'stroke-width': cell * .03 });
+  }
+  if (opt.dead) opt.dead.forEach(i => { const [x, y] = board.xy(i); if (x >= v.x0 && x <= v.x1 && y >= v.y0 && y <= v.y1) el('circle', { cx: px(x), cy: py(y), r, fill: '#e2b96a', opacity: .55 }); });
+  const mark = (i, f) => { if (i == null || i < 0) return; const [x, y] = board.xy(i); if (x < v.x0 || x > v.x1 || y < v.y0 || y > v.y1) return; f(px(x), py(y)); };
+  mark(opt.mark, (X, Y) => { const d = cell * .28; el('path', { d: `M${X - d} ${Y - d}L${X + d} ${Y + d}M${X + d} ${Y - d}L${X - d} ${Y + d}`, stroke: '#e5483f', 'stroke-width': cell * .12, 'stroke-linecap': 'round' }); });
+  mark(opt.circle, (X, Y) => el('circle', { cx: X, cy: Y, r: cell * .3, fill: 'none', stroke: '#2f8f5b', 'stroke-width': cell * .1 }));
+  if (opt.hover != null && opt.hover >= 0 && !board.get(opt.hover))
+    mark(opt.hover, (X, Y) => el('circle', { cx: X, cy: Y, r, fill: (opt.hoverColor || board.turn) === GoEngine.BLACK ? '#111' : '#fff', opacity: .4 }));
+}
+function pointAt(svg, board, e, view) {
+  const { v, cell, pad, Wd, Ht } = geomOf(board, view), rect = svg.getBoundingClientRect();
+  const x = Math.round(((e.clientX - rect.left) * Wd / rect.width - pad) / cell) + v.x0;
+  const y = Math.round(((e.clientY - rect.top) * Ht / rect.height - pad) / cell) + v.y0;
+  return (x < v.x0 || y < v.y0 || x > v.x1 || y > v.y1) ? -1 : board.idx(x, y);
+}
+// 8とおりの まわし・うらがえし
+function tf(sym, s, n) {
+  let x = s.charCodeAt(0) - 97, y = s.charCodeAt(1) - 97;
+  if (sym & 4) [x, y] = [y, x];
+  if (sym & 1) x = n - 1 - x;
+  if (sym & 2) y = n - 1 - y;
+  return String.fromCharCode(97 + x) + String.fromCharCode(97 + y);
+}
+function tfTree(t, sym, n) {
+  const o = {};
+  for (const k in t) { const v = t[k]; o[tf(sym, k, n)] = { ...v, ...(v.reply ? { reply: tf(sym, v.reply, n) } : {}), ...(v.next ? { next: tfTree(v.next, sym, n) } : {}) }; }
+  return o;
+}
+const toIdx = (b, s) => b.idx(s.charCodeAt(0) - 97, s.charCodeAt(1) - 97);
+const toSgf = (b, i) => { const [x, y] = b.xy(i); return String.fromCharCode(97 + x) + String.fromCharCode(97 + y); };
+function treeKeys(t, out = []) { for (const k in t) { out.push(k); if (t[k].reply) out.push(t[k].reply); if (t[k].next) treeKeys(t[k].next, out); } return out; }
+// 問題データから盤をつくる
+function boardFromProblem(p, sym = 0) {
+  const n = p.size, b = new GoEngine.Board(n);
+  p.B.forEach(s => b.grid[toIdx(b, tf(sym, s, n))] = GoEngine.BLACK);
+  p.W.forEach(s => b.grid[toIdx(b, tf(sym, s, n))] = GoEngine.WHITE);
+  b.turn = p.toPlay === 'W' ? GoEngine.WHITE : GoEngine.BLACK;
+  const tree = tfTree(p.tree, sym, n);
+  return { board: b, tree, view: autoView(b, treeKeys(tree).map(k => toIdx(b, k))) };
+}
+let _ac;
+function sound(type) {
+  try {
+    _ac = _ac || new (window.AudioContext || window.webkitAudioContext)();
+    const ac = _ac, t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    if (type === 'stone') { o.type = 'triangle'; o.frequency.setValueAtTime(900, t); o.frequency.exponentialRampToValueAtTime(300, t + .05); g.gain.setValueAtTime(.35, t); g.gain.exponentialRampToValueAtTime(.001, t + .09); o.start(t); o.stop(t + .1); }
+    else if (type === 'ok') { o.type = 'sine'; [660, 880, 1320].forEach((f, k) => o.frequency.setValueAtTime(f, t + k * .08)); g.gain.setValueAtTime(.25, t); g.gain.exponentialRampToValueAtTime(.001, t + .35); o.start(t); o.stop(t + .36); }
+    else if (type === 'fan') { o.type = 'sine'; [523, 659, 784, 1047, 784, 1047].forEach((f, k) => o.frequency.setValueAtTime(f, t + k * .12)); g.gain.setValueAtTime(.25, t); g.gain.setValueAtTime(.25, t + .6); g.gain.exponentialRampToValueAtTime(.001, t + .9); o.start(t); o.stop(t + .9); }
+    else { o.type = 'square'; o.frequency.setValueAtTime(180, t); g.gain.setValueAtTime(.12, t); g.gain.exponentialRampToValueAtTime(.001, t + .2); o.start(t); o.stop(t + .21); }
+  } catch (_) {}
+}
+
+</script>
+<script id="cpuSrc">
+// 国分アンビシャス囲碁アプリ — CPU（9路盤 モンテカルロ木探索）
+// ブラウザでは Web Worker として動く。node でもテストできる。
+const GoCPU = (() => {
+  const EMPTY = 0, BLACK = 1, WHITE = 2, EDGE = 3;
+  class Fast {
+    constructor(n) {
+      this.n = n; this.w = n + 2; const L = this.w * this.w;
+      this.color = new Int8Array(L).fill(EDGE); this.head = new Int16Array(L); this.next = new Int16Array(L); this.plib = new Int16Array(L);
+      this.dirs = [1, -1, this.w, -this.w]; this.diag = [this.w + 1, this.w - 1, -this.w + 1, -this.w - 1];
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) this.color[this.p(x, y)] = EMPTY;
+      this.ko = 0; this.pts = []; for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) this.pts.push(this.p(x, y));
+    }
+    p(x, y) { return (y + 1) * this.w + x + 1; }
+    clone() {
+      const b = Object.create(Fast.prototype);
+      b.n = this.n; b.w = this.w; b.dirs = this.dirs; b.diag = this.diag; b.pts = this.pts; b.ko = this.ko;
+      b.color = this.color.slice(); b.head = this.head.slice(); b.next = this.next.slice(); b.plib = this.plib.slice();
+      return b;
+    }
+    legal(p, c) {
+      const col = this.color;
+      if (col[p] !== EMPTY || p === this.ko) return false;
+      const o = 3 - c, hs = [], cnt = [];
+      for (const d of this.dirs) {
+        const q = p + d, k = col[q];
+        if (k === EMPTY) return true;
+        if (k === EDGE) continue;
+        const h = this.head[q], j = hs.indexOf(h);
+        if (j < 0) { hs.push(h); cnt.push(1); } else cnt[j]++;
+      }
+      for (let j = 0; j < hs.length; j++) {
+        const h = hs[j], own = col[h] === c;
+        if (own && this.plib[h] > cnt[j]) return true;
+        if (!own && this.plib[h] === cnt[j]) return true;
+      }
+      return false;
+    }
+    eyeLike(p, c) {
+      const col = this.color; let edge = false;
+      for (const d of this.dirs) { const k = col[p + d]; if (k === EDGE) edge = true; else if (k !== c) return false; }
+      let bad = 0;
+      for (const d of this.diag) { const k = col[p + d]; if (k === 3 - c) bad++; }
+      return edge ? bad === 0 : bad < 2;
+    }
+    merge(a, b) { // b の連を a へ
+      let s = b; do { this.head[s] = a; s = this.next[s]; } while (s !== b);
+      const t = this.next[a]; this.next[a] = this.next[b]; this.next[b] = t;
+      this.plib[a] += this.plib[b];
+    }
+    play(p, c) { // 合法手のみ。取った石の数を返す
+      const col = this.color, o = 3 - c;
+      col[p] = c; this.head[p] = p; this.next[p] = p; this.plib[p] = 0;
+      for (const d of this.dirs) if (col[p + d] === EMPTY) this.plib[p]++;
+      for (const d of this.dirs) {
+        const q = p + d; if (col[q] !== c) continue;
+        const h = this.head[q]; this.plib[h]--;
+        if (h !== this.head[p]) this.merge(this.head[p], h);
+      }
+      let cap = 0, capPos = 0;
+      for (const d of this.dirs) {
+        const q = p + d; if (col[q] !== o) continue;
+        const h = this.head[q]; this.plib[h]--;
+        if (this.plib[h] === 0) { const k = this.remove(h); cap += k; capPos = q; }
+      }
+      const me = this.head[p];
+      this.ko = (cap === 1 && this.next[me] === me && this.plib[me] === 1) ? capPos : 0;
+      return cap;
+    }
+    remove(h) {
+      const st = []; let s = h; do { st.push(s); s = this.next[s]; } while (s !== h);
+      for (const x of st) this.color[x] = EMPTY;
+      for (const x of st) for (const d of this.dirs) { const t = x + d, k = this.color[t]; if (k === BLACK || k === WHITE) this.plib[this.head[t]]++; }
+      return st.length;
+    }
+    moves(c) { const m = []; for (const p of this.pts) if (this.legal(p, c) && !this.eyeLike(p, c)) m.push(p); return m; }
+    // ランダムに最後まで打つ
+    playout(c, rnd) {
+      let passes = 0, limit = this.n * this.n * 3;
+      const buf = [];
+      while (passes < 2 && limit-- > 0) {
+        buf.length = 0; for (const p of this.pts) if (this.color[p] === EMPTY) buf.push(p);
+        let moved = false;
+        while (buf.length) {
+          const k = (rnd() * buf.length) | 0, p = buf[k];
+          if (this.legal(p, c) && !this.eyeLike(p, c)) { this.play(p, c); moved = true; break; }
+          buf[k] = buf[buf.length - 1]; buf.pop();
+        }
+        if (moved) passes = 0; else { passes++; this.ko = 0; }
+        c = 3 - c;
+      }
+    }
+    // 終わった盤の 地＋石（エリア）
+    owner(p) {
+      const k = this.color[p]; if (k === BLACK || k === WHITE) return k;
+      let b = 0, w = 0; for (const d of this.dirs) { const q = this.color[p + d]; if (q === BLACK) b++; if (q === WHITE) w++; }
+      return b && !w ? BLACK : w && !b ? WHITE : 0;
+    }
+    score() { let s = 0; for (const p of this.pts) { const o = this.owner(p); if (o === BLACK) s++; else if (o === WHITE) s--; } return s; } // 黒 − 白
+  }
+  function fromGrid(n, grid, ko) { // grid: 0/1/2 の配列（x + y*n）
+    const b = new Fast(n);
+    for (let i = 0; i < n * n; i++) if (grid[i]) { const p = b.p(i % n, (i / n) | 0); if (b.legal(p, grid[i]) || true) b.play(p, grid[i]); }
+    b.ko = ko >= 0 ? b.p(ko % n, (ko / n) | 0) : 0;
+    return b;
+  }
+  function makeRnd(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; return (s >>> 0) / 4294967296; }; }
+
+  // 木探索（UCT）
+  function search(root, c, opt) {
+    const rnd = makeRnd(opt.seed || (Date.now() & 0xffffffff)), komi = opt.komi || 0;
+    const mk = (b, toMove, move, parent) => ({ move, parent, toMove, n: 0, w: 0, kids: null, untried: b.moves(toMove) });
+    const top = mk(root, c, 0, null);
+    const t0 = Date.now();
+    let it = 0;
+    while (it < opt.playouts && Date.now() - t0 < (opt.ms || 1e9)) {
+      it++;
+      const b = root.clone(); let node = top;
+      // 選ぶ
+      while (node.untried.length === 0 && node.kids && node.kids.length) {
+        let best = null, bv = -1, ln = Math.log(node.n);
+        for (const k of node.kids) { const v = k.w / k.n + 0.9 * Math.sqrt(ln / k.n); if (v > bv) { bv = v; best = k; } }
+        b.play(best.move, node.toMove); node = best;
+      }
+      // ひろげる
+      if (node.untried.length) {
+        const j = (rnd() * node.untried.length) | 0, m = node.untried[j];
+        node.untried[j] = node.untried[node.untried.length - 1]; node.untried.pop();
+        if (b.legal(m, node.toMove)) {
+          b.play(m, node.toMove);
+          const kid = mk(b, 3 - node.toMove, m, node);
+          (node.kids = node.kids || []).push(kid); node = kid;
+        }
+      }
+      // 打ってみる
+      b.playout(node.toMove, rnd);
+      const s = b.score() - komi; // 黒から見た差
+      // さかのぼる（node.w は「その手を打った側」の勝ち数）
+      for (let x = node; x; x = x.parent) {
+        x.n++;
+        const mover = 3 - x.toMove;
+        if ((s > 0 && mover === BLACK) || (s < 0 && mover === WHITE)) x.w++; else if (s === 0) x.w += .5;
+      }
+    }
+    return { top, it };
+  }
+
+  // CPU の手を決める
+  function think(n, grid, ko, c, level, oppPassed, komi) {
+    const b = fromGrid(n, grid, ko);
+    const set = { weak: { playouts: 250 }, normal: { playouts: 3000, ms: 1500 }, strong: { playouts: 30000, ms: 2500 } }[level];
+    const { top, it } = search(b, c, { ...set, komi });
+    const kids = top.kids || [];
+    if (!kids.length) return { pass: true };
+    let pick;
+    if (level === 'weak') { // 回数に応じて ランダムに えらぶ（手かげん）
+      const tot = kids.reduce((a, k) => a + k.n, 0); let r = Math.random() * tot;
+      for (const k of kids) { r -= k.n; if (r <= 0) { pick = k; break; } }
+      pick = pick || kids[0];
+    } else pick = kids.reduce((a, k) => k.n > a.n ? k : a);
+    const rate = pick.w / pick.n;
+    // 相手がパスして こちらが勝っているなら パス
+    if (oppPassed) {
+      const est = estimate(n, grid, ko, c, komi, 300);
+      if ((c === BLACK && est.score > 0) || (c === WHITE && est.score < 0)) return { pass: true, rate };
+    }
+    if (rate < 0.03 && level !== 'weak') return { pass: true, rate };
+    const x = (pick.move % b.w) - 1, y = ((pick.move / b.w) | 0) - 1;
+    return { move: y * n + x, rate, it };
+  }
+
+  // 死に石と地の見つもり
+  function estimate(n, grid, ko, toMove, komi, playouts = 400) {
+    const b = fromGrid(n, grid, ko), rnd = makeRnd(12345), own = new Float32Array(n * n);
+    for (let k = 0; k < playouts; k++) {
+      const c = b.clone(); c.playout(toMove, rnd);
+      for (let i = 0; i < n * n; i++) { const o = c.owner(c.p(i % n, (i / n) | 0)); if (o === BLACK) own[i]++; else if (o === WHITE) own[i]--; }
+    }
+    for (let i = 0; i < n * n; i++) own[i] /= playouts;
+    // 死に石
+    const g = Array.from(grid), dead = [];
+    for (let i = 0; i < n * n; i++) {
+      if (g[i] === BLACK && own[i] < -0.3) { dead.push(i); }
+      if (g[i] === WHITE && own[i] > 0.3) { dead.push(i); }
+    }
+    dead.forEach(i => g[i] = 0);
+    // 地：まわりが ひといろの 空点のかたまり
+    const terr = new Int8Array(n * n), seen = new Uint8Array(n * n);
+    for (let i = 0; i < n * n; i++) {
+      if (g[i] || seen[i]) continue;
+      const area = [i], st = [i]; seen[i] = 1; let touchB = false, touchW = false;
+      while (st.length) {
+        const p = st.pop(), x = p % n, y = (p / n) | 0;
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const xx = x + dx, yy = y + dy; if (xx < 0 || yy < 0 || xx >= n || yy >= n) continue;
+          const q = yy * n + xx;
+          if (g[q] === BLACK) touchB = true; else if (g[q] === WHITE) touchW = true;
+          else if (!seen[q]) { seen[q] = 1; area.push(q); st.push(q); }
+        }
+      }
+      const o = touchB && !touchW ? BLACK : touchW && !touchB ? WHITE : 0;
+      area.forEach(p => terr[p] = o);
+    }
+    // まだ決まっていない所は 見つもりで
+    for (let i = 0; i < n * n; i++) if (!g[i] && !terr[i]) terr[i] = own[i] > 0.6 ? BLACK : own[i] < -0.6 ? WHITE : 0;
+    let sb = 0, sw = 0;
+    for (let i = 0; i < n * n; i++) { if (g[i] === BLACK || terr[i] === BLACK) sb++; if (g[i] === WHITE || terr[i] === WHITE) sw++; }
+    // 死に石の場所は相手の地
+    return { black: sb, white: sw, komi, score: sb - sw - komi, dead, terr: Array.from(terr) };
+  }
+  return { think, estimate, Fast, fromGrid, BLACK, WHITE };
+})();
+if (typeof module !== 'undefined') module.exports = GoCPU;
+// Web Worker として
+if (typeof self !== 'undefined' && typeof window === 'undefined' && typeof module === 'undefined') {
+  self.onmessage = e => {
+    const d = e.data;
+    if (d.type === 'think') self.postMessage({ id: d.id, type: 'think', ...GoCPU.think(d.n, d.grid, d.ko, d.color, d.level, d.oppPassed, d.komi) });
+    if (d.type === 'estimate') self.postMessage({ id: d.id, type: 'estimate', ...GoCPU.estimate(d.n, d.grid, d.ko, d.color, d.komi) });
+  };
+}
+
+</script>
+<script>
+const PROBLEMS = {"21":[{"id":"L21-01","level":21,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["ed","fc","gd","if"],"W":["ae","bd","bh","fd","gi"],"toPlay":"B","tree":{"fe":{"ok":true}}},{"id":"L21-02","level":21,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["ca","ee","fd","ff","hg"],"W":["bd","fe"],"toPlay":"B","tree":{"ge":{"ok":true}}},{"id":"L21-03","level":21,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["ae","ga","hb"],"W":["be","cd","ce","ge","ha","ia"],"toPlay":"B","tree":{"ib":{"ok":true}}},{"id":"L21-04","level":21,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["dc","eb","ed","fd","fi","gc","hg"],"W":["ac","bg","df","ec","fc"],"toPlay":"B","tree":{"fb":{"ok":true}}},{"id":"L21-05","level":21,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["ai","cf"],"W":["bf","cg","df","gb","hi"],"toPlay":"B","tree":{"ce":{"ok":true}}},{"id":"L21-06","level":21,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["cb","fe"],"W":["bg","ee","ff","ge"],"toPlay":"B","tree":{"fd":{"ok":true}}},{"id":"L21-07","level":21,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["fb","gd","he","ig"],"W":["ce","ge"],"toPlay":"B","tree":{"fe":{"ok":true},"gf":{"ok":true}}},{"id":"L21-08","level":21,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["bc","ef"],"W":["ac","ci","dd"],"toPlay":"B","tree":{"ab":{"ok":true},"ad":{"ok":true}}},{"id":"L21-09","level":21,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["ac","bb","eh","fg","gg","hh","hi"],"W":["aa","ab","fh","gh","gi"],"toPlay":"B","tree":{"fi":{"ok":true}}},{"id":"L21-10","level":21,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["ec","ed","ef","fb","fe","ge","hd"],"W":["ee","fc","fd","gd"],"toPlay":"B","tree":{"gc":{"ok":true}}},{"id":"L21-11","level":21,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["bg","ff","he","id"],"W":["bi","cg","hd"],"toPlay":"B","tree":{"ie":{"ok":true}}},{"id":"L21-12","level":21,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["bg","cc","dd"],"W":["cd","di","ig"],"toPlay":"B","tree":{"dc":{"ok":true}}},{"id":"L21-13","level":21,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["bd","da","dg","gd"],"W":["cg","df"],"toPlay":"B","tree":{"cf":{"ok":true}}},{"id":"L21-14","level":21,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["ag","bb","hg"],"W":["fc","gg","hh"],"toPlay":"B","tree":{"gh":{"ok":true}}},{"id":"L21-15","level":21,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["be","de","df","ih"],"W":["ce","fb"],"toPlay":"B","tree":{"cd":{"reply":"cf","next":{"cg":{"reply":"bf","next":{"af":{"reply":"bg","next":{"bh":{"reply":"ag","next":{"ah":{"ok":true}}}}},"bg":{"reply":"af","next":{"ae":{"reply":"ag","next":{"ah":{"ok":true}}},"ag":{"reply":"ae","next":{"ad":{"ok":true}}}}}}}}}}},{"id":"L21-16","level":21,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["ff","fg","ge","ha","he"],"W":["cb","gf","ih"],"toPlay":"B","tree":{"hf":{"reply":"gg","next":{"gh":{"reply":"hg","next":{"hh":{"reply":"ig","next":{"if":{"reply":"ii","next":{"hi":{"ok":true}}},"ii":{"reply":"if","next":{"ie":{"ok":true}}}}}}}}},"gg":{"reply":"hf","next":{"if":{"reply":"hg","next":{"hh":{"reply":"ig","next":{"ii":{"ok":true}}}}},"hg":{"reply":"if","next":{"ie":{"reply":"ig","next":{"hh":{"reply":"ii","next":{"hi":{"ok":true}}},"ii":{"reply":"hi","next":{"hh":{"reply":"ii","next":{"gi":{"ok":true}}}}}}},"ig":{"reply":"ie","next":{"id":{"ok":true}}}}}}}}},{"id":"L21-17","level":21,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["de","ee","ff","fg"],"W":["ch","ef"],"toPlay":"B","tree":{"dg":{"reply":"df","next":{"cf":{"reply":"eg","next":{"eh":{"ok":true}}}}}}},{"id":"L21-18","level":21,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["fh","gh","hf","hg"],"W":["cb","ce","gg"],"toPlay":"B","tree":{"ff":{"reply":"fg","next":{"eg":{"reply":"gf","next":{"ge":{"ok":true}}}}}}}],"22":[{"id":"L22-01","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["dd","ed","fe","ff"],"W":["bg","ee","ia"],"toPlay":"B","tree":{"df":{"reply":"de","next":{"ce":{"reply":"ef","next":{"eg":{"ok":true}}}}}}},{"id":"L22-02","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["ae","dc","ec","ef","fd"],"W":["be","ed","gh"],"toPlay":"B","tree":{"de":{"reply":"dd","next":{"cd":{"reply":"ee","next":{"fe":{"ok":true}}}}}}},{"id":"L22-03","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["cf","cg","dh","eh"],"W":["aa","dg","hd"],"toPlay":"B","tree":{"ef":{"reply":"eg","next":{"fg":{"reply":"df","next":{"de":{"ok":true}}}}}}},{"id":"L22-04","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["bc","bd","cb","db"],"W":["ai","cc","fi","he"],"toPlay":"B","tree":{"dd":{"reply":"dc","next":{"ec":{"reply":"cd","next":{"ce":{"ok":true}}}}}}},{"id":"L22-05","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["fg","gg","he","hf"],"W":["ae","cb","eb","gf"],"toPlay":"B","tree":{"fe":{"reply":"ff","next":{"ef":{"reply":"ge","next":{"gd":{"ok":true}}}}}}},{"id":"L22-06","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["dc","ec","fd","fe"],"W":["bg","ed"],"toPlay":"B","tree":{"de":{"reply":"dd","next":{"cd":{"reply":"ee","next":{"ef":{"ok":true}}}}}}},{"id":"L22-07","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["ce","cf","dg","eg","ie"],"W":["df","gi","hb"],"toPlay":"B","tree":{"ee":{"reply":"ef","next":{"ff":{"reply":"de","next":{"dd":{"ok":true}}}}}}},{"id":"L22-08","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["df","dg","eh","fh"],"W":["bd","eg","hd"],"toPlay":"B","tree":{"ff":{"reply":"fg","next":{"gg":{"reply":"ef","next":{"ee":{"ok":true}}}}}}},{"id":"L22-09","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["bd","be","cf","df"],"W":["ce","ea","ih"],"toPlay":"B","tree":{"dd":{"reply":"de","next":{"ee":{"reply":"cd","next":{"cc":{"ok":true}}}}}}},{"id":"L22-10","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["eb","fb","gc","gd","ia"],"W":["de","fc"],"toPlay":"B","tree":{"ed":{"reply":"ec","next":{"dc":{"reply":"fd","next":{"fe":{"ok":true}}}}}}},{"id":"L22-11","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["ac","fb","gb","hc","hd"],"W":["bf","gc"],"toPlay":"B","tree":{"fd":{"reply":"fc","next":{"ec":{"reply":"gd","next":{"ge":{"ok":true}}}}}}},{"id":"L22-12","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["bd","eh","fh","gf","gg"],"W":["ce","fg"],"toPlay":"B","tree":{"ef":{"reply":"eg","next":{"dg":{"reply":"ff","next":{"fe":{"ok":true}}}}}}},{"id":"L22-13","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["df","dg","eh","fh"],"W":["eg","gd"],"toPlay":"B","tree":{"ff":{"reply":"fg","next":{"gg":{"reply":"ef","next":{"ee":{"ok":true}}}}}}},{"id":"L22-14","level":22,"title":"ゲタで とろう","hint":"すぐに アタリに しないで、にげみちを ふさぐように はなれて うとう","size":9,"B":["cb","fg","gg","he","hf"],"W":["ca","ed","gf"],"toPlay":"B","tree":{"fe":{"reply":"ff","next":{"ef":{"reply":"ge","next":{"gd":{"ok":true}}}}}}}],"23":[{"id":"L23-01","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["bc","bd","be","dd","fi"],"W":["cd","dh","ig"],"toPlay":"B","tree":{"ce":{"reply":"cc","next":{"cb":{"reply":"dc","next":{"ec":{"reply":"db","next":{"eb":{"reply":"da","next":{"ca":{"reply":"ea","next":{"fa":{"ok":true}}},"ea":{"reply":"ca","next":{"ba":{"ok":true}}}}},"da":{"reply":"eb","next":{"fb":{"reply":"ea","next":{"fa":{"ok":true}}}}}}}}}}}}},{"id":"L23-02","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["cd","db","ed","ii"],"W":["ai","dd","ei"],"toPlay":"B","tree":{"de":{"reply":"dc","next":{"cc":{"reply":"ec","next":{"fc":{"reply":"eb","next":{"fb":{"reply":"ea","next":{"da":{"reply":"fa","next":{"ga":{"ok":true}}},"fa":{"reply":"da","next":{"ca":{"ok":true}}}}},"ea":{"reply":"fb","next":{"gb":{"reply":"fa","next":{"ga":{"ok":true}}}}}}}}},"ec":{"reply":"cc","next":{"bc":{"reply":"cb","next":{"bb":{"reply":"ca","next":{"ba":{"reply":"da","next":{"ea":{"ok":true}}},"da":{"reply":"ba","next":{"aa":{"ok":true}}}}},"ca":{"reply":"bb","next":{"ab":{"reply":"ba","next":{"aa":{"ok":true}}}}}}}}}}}}},{"id":"L23-03","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["ah","cd","db","ed"],"W":["bg","dd"],"toPlay":"B","tree":{"de":{"reply":"dc","next":{"cc":{"reply":"ec","next":{"fc":{"reply":"eb","next":{"fb":{"reply":"ea","next":{"da":{"reply":"fa","next":{"ga":{"ok":true}}},"fa":{"reply":"da","next":{"ca":{"ok":true}}}}},"ea":{"reply":"fb","next":{"gb":{"reply":"fa","next":{"ga":{"ok":true}}}}}}}}},"ec":{"reply":"cc","next":{"bc":{"reply":"cb","next":{"bb":{"reply":"ca","next":{"ba":{"reply":"da","next":{"ea":{"ok":true}}},"da":{"reply":"ba","next":{"aa":{"ok":true}}}}},"ca":{"reply":"bb","next":{"ab":{"reply":"ba","next":{"aa":{"ok":true}}}}}}}}}}}}},{"id":"L23-04","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["ag","cf","dg","dh"],"W":["cg","hb","hh","ic"],"toPlay":"B","tree":{"bg":{"reply":"ch","next":{"bh":{"reply":"ci","next":{"bi":{"reply":"di","next":{"ei":{"ok":true}}},"di":{"reply":"bi","next":{"ai":{"ok":true}}}}},"ci":{"reply":"bh","next":{"ah":{"reply":"bi","next":{"ai":{"ok":true}}},"bi":{"reply":"ah","next":{"ai":{"ok":true}}}}}}},"ch":{"reply":"bg","next":{"bf":{"reply":"bh","next":{"bi":{"reply":"ah","next":{"ai":{"ok":true}}}}},"bh":{"reply":"bf","next":{"be":{"reply":"af","next":{"ae":{"ok":true}}}}}}}}},{"id":"L23-05","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["ec","fa","gc","if"],"W":["fc"],"toPlay":"B","tree":{"fd":{"reply":"fb","next":{"eb":{"reply":"gb","next":{"hb":{"reply":"ga","next":{"ha":{"ok":true}}}}},"gb":{"reply":"eb","next":{"db":{"reply":"ea","next":{"da":{"ok":true}}}}}}}}},{"id":"L23-06","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["bd","cb","cf","dd"],"W":["cd","fi","gb","hd"],"toPlay":"B","tree":{"cc":{"reply":"ce","next":{"de":{"reply":"be","next":{"ae":{"reply":"bf","next":{"bg":{"reply":"af","next":{"ag":{"ok":true}}}}},"bf":{"reply":"ae","next":{"ad":{"reply":"af","next":{"ag":{"ok":true}}},"af":{"reply":"ad","next":{"ac":{"ok":true}}}}}}}}},"ce":{"reply":"cc","next":{"bc":{"reply":"dc","next":{"ec":{"reply":"db","next":{"eb":{"reply":"da","next":{"ca":{"reply":"ea","next":{"fa":{"ok":true}}},"ea":{"reply":"ca","next":{"ba":{"ok":true}}}}},"da":{"reply":"eb","next":{"fb":{"reply":"ea","next":{"fa":{"ok":true}}}}}}}}},"dc":{"reply":"bc","next":{"ac":{"reply":"bb","next":{"ba":{"reply":"ab","next":{"aa":{"ok":true}}}}},"bb":{"reply":"ac","next":{"ab":{"reply":"ad","next":{"ae":{"ok":true}}},"ad":{"reply":"ab","next":{"aa":{"ok":true}}}}}}}}}}},{"id":"L23-07","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["fg","ge","hg"],"W":["bd","gg"],"toPlay":"B","tree":{"gh":{"reply":"gf","next":{"ff":{"reply":"hf","next":{"if":{"reply":"he","next":{"hd":{"reply":"ie","next":{"id":{"ok":true}}}}},"he":{"reply":"if","next":{"ie":{"reply":"ig","next":{"ih":{"ok":true}}},"ig":{"reply":"ie","next":{"id":{"ok":true}}}}}}}}}}},{"id":"L23-08","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["af","cd","db","de"],"W":["dd","gi"],"toPlay":"B","tree":{"ed":{"reply":"dc","next":{"cc":{"reply":"ec","next":{"fc":{"reply":"eb","next":{"fb":{"reply":"ea","next":{"da":{"reply":"fa","next":{"ga":{"ok":true}}},"fa":{"reply":"da","next":{"ca":{"ok":true}}}}},"ea":{"reply":"fb","next":{"gb":{"reply":"fa","next":{"ga":{"ok":true}}}}}}}}},"ec":{"reply":"cc","next":{"bc":{"reply":"cb","next":{"bb":{"reply":"ca","next":{"ba":{"reply":"da","next":{"ea":{"ok":true}}},"da":{"reply":"ba","next":{"aa":{"ok":true}}}}},"ca":{"reply":"bb","next":{"ab":{"reply":"ba","next":{"aa":{"ok":true}}}}}}}}}}}}},{"id":"L23-09","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["eb","ee","ei","fd"],"W":["ed","gg","gh"],"toPlay":"B","tree":{"dd":{"reply":"ec","next":{"dc":{"reply":"fc","next":{"gc":{"reply":"fb","next":{"gb":{"reply":"fa","next":{"ea":{"reply":"ga","next":{"ha":{"ok":true}}},"ga":{"reply":"ea","next":{"da":{"ok":true}}}}},"fa":{"reply":"gb","next":{"hb":{"reply":"ga","next":{"ha":{"ok":true}}}}}}}}},"fc":{"reply":"dc","next":{"cc":{"reply":"db","next":{"cb":{"reply":"da","next":{"ca":{"reply":"ea","next":{"fa":{"ok":true}}},"ea":{"reply":"ca","next":{"ba":{"ok":true}}}}},"da":{"reply":"cb","next":{"bb":{"reply":"ca","next":{"ba":{"ok":true}}}}}}}}}}}}},{"id":"L23-10","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["ac","cb","db","dc"],"W":["cc","hb"],"toPlay":"B","tree":{"cd":{"reply":"bc","next":{"bb":{"reply":"bd","next":{"be":{"reply":"ad","next":{"ae":{"ok":true}}}}},"bd":{"reply":"bb","next":{"ba":{"reply":"ab","next":{"aa":{"ok":true}}}}}}}}},{"id":"L23-11","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["bd","dc","dd"],"W":["cd","ci"],"toPlay":"B","tree":{"ce":{"reply":"cc","next":{"cb":{"reply":"bc","next":{"ac":{"reply":"bb","next":{"ba":{"reply":"ab","next":{"aa":{"ok":true}}}}},"bb":{"reply":"ac","next":{"ab":{"reply":"ad","next":{"ae":{"ok":true}}},"ad":{"reply":"ab","next":{"aa":{"ok":true}}}}}}}}}}},{"id":"L23-12","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["cg","dc","eg","eh","fg"],"W":["dg"],"toPlay":"B","tree":{"df":{"reply":"dh","next":{"ch":{"reply":"di","next":{"ci":{"reply":"ei","next":{"fi":{"ok":true}}},"ei":{"reply":"ci","next":{"bi":{"ok":true}}}}},"di":{"reply":"ch","next":{"bh":{"reply":"ci","next":{"bi":{"ok":true}}}}}}}}},{"id":"L23-13","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["bd","cc","cd","cf","he","hi"],"W":["ah","ce"],"toPlay":"B","tree":{"de":{"reply":"be","next":{"ae":{"reply":"bf","next":{"bg":{"reply":"af","next":{"ag":{"ok":true}}}}},"bf":{"reply":"ae","next":{"ad":{"reply":"af","next":{"ag":{"ok":true}}},"af":{"reply":"ad","next":{"ac":{"ok":true}}}}}}}}},{"id":"L23-14","level":23,"title":"シチョウで とろう","hint":"ジグザグに アタリを かけつづけよう。にげる ほうに かべを つくるよ","size":9,"B":["cg","da","de","dg","eg"],"W":["df","he"],"toPlay":"B","tree":{"ef":{"reply":"cf","next":{"bf":{"reply":"ce","next":{"cd":{"reply":"be","next":{"ae":{"reply":"bd","next":{"bc":{"reply":"ad","next":{"ac":{"ok":true}}}}},"bd":{"reply":"ae","next":{"ad":{"reply":"af","next":{"ag":{"ok":true}}},"af":{"reply":"ad","next":{"ac":{"ok":true}}}}}}}}}}}}}],"24":[{"id":"L24-01","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["ad","di","fd","hg"],"W":["ed","fe"],"toPlay":"B","tree":{"ee":{"ok":true}}},{"id":"L24-02","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["eg","gb"],"W":["cb","ef","fg"],"toPlay":"B","tree":{"ff":{"ok":true}}},{"id":"L24-03","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["cc"],"W":["bc","cb","ha","hh"],"toPlay":"B","tree":{"bb":{"ok":true}}},{"id":"L24-04","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["hf"],"W":["ba","eh","gf","hg"],"toPlay":"B","tree":{"gg":{"ok":true}}},{"id":"L24-05","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["fd"],"W":["dc","di","fe","gd"],"toPlay":"B","tree":{"ge":{"ok":true}}},{"id":"L24-06","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["db"],"W":["ai","be","dc","eb"],"toPlay":"B","tree":{"ec":{"ok":true}}},{"id":"L24-07","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["cg"],"W":["bb","cf","dg","eb"],"toPlay":"B","tree":{"df":{"ok":true}}},{"id":"L24-08","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["bg","fg"],"W":["ec","fh","gg"],"toPlay":"B","tree":{"gh":{"ok":true}}},{"id":"L24-09","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["bg","fd"],"W":["bf","ca","cg","eb","ib"],"toPlay":"B","tree":{"cf":{"ok":true}}},{"id":"L24-10","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["cg","da","fd","ha"],"W":["be","ch","dg"],"toPlay":"B","tree":{"dh":{"ok":true}}},{"id":"L24-11","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["cg","gd","hh","ia"],"W":["cf","dg","gf"],"toPlay":"B","tree":{"df":{"ok":true}}},{"id":"L24-12","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["ad","hh"],"W":["cf","gh","hg"],"toPlay":"B","tree":{"gg":{"ok":true}}},{"id":"L24-13","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["cd","ec","eg"],"W":["ef","fg","gb","ig"],"toPlay":"B","tree":{"ff":{"ok":true}}},{"id":"L24-14","level":24,"title":"しろを きろう","hint":"しろの 石が ななめに ならんでいるよ。あいだに うって きりはなそう","size":9,"B":["eg"],"W":["eh","fc","fg","gb","ha","ie"],"toPlay":"B","tree":{"fh":{"ok":true}}}],"25":[{"id":"L25-01","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["be","cf"],"W":["bb","ce","eb","fd","ie"],"toPlay":"B","tree":{"bf":{"ok":true}}},{"id":"L25-02","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["df","eg","ic"],"W":["aa","dg","hc"],"toPlay":"B","tree":{"ef":{"ok":true}}},{"id":"L25-03","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["fd","ge"],"W":["ai","be","ci","gd"],"toPlay":"B","tree":{"fe":{"ok":true}}},{"id":"L25-04","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["di","eh","gg"],"W":["dh","ga","ia"],"toPlay":"B","tree":{"ei":{"ok":true}}},{"id":"L25-05","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["hh","id","ig"],"W":["dc","fi","gb","hg"],"toPlay":"B","tree":{"ih":{"ok":true}}},{"id":"L25-06","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["ed","fa","gi","he","hh"],"W":["gh","hd"],"toPlay":"B","tree":{"hi":{"ok":true}}},{"id":"L25-07","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["dd","ec","gh"],"W":["bf","ed","fa","hg"],"toPlay":"B","tree":{"dc":{"ok":true}}},{"id":"L25-08","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["fg","gh"],"W":["da","de","fa","ga","gg"],"toPlay":"B","tree":{"fh":{"ok":true}}},{"id":"L25-09","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["bd","dd","ga","ge","hd","hh"],"W":["gd"],"toPlay":"B","tree":{"he":{"ok":true}}},{"id":"L25-10","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["ef","fa","fi","gh"],"W":["ah","fh","ib"],"toPlay":"B","tree":{"gi":{"ok":true}}},{"id":"L25-11","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["df","ee"],"W":["bi","ch","de"],"toPlay":"B","tree":{"ef":{"ok":true}}},{"id":"L25-12","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["bh","cg","gc","gd"],"W":["ch","ff","hd"],"toPlay":"B","tree":{"bg":{"ok":true}}},{"id":"L25-13","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["ge","hd"],"W":["bd","cf","ei","gd"],"toPlay":"B","tree":{"he":{"ok":true}}},{"id":"L25-14","level":25,"title":"くろを つなごう","hint":"ななめの くろ石が きられそう。つなぐ ところは どこ？","size":9,"B":["ag","bf","ib"],"W":["bg","ge","gh"],"toPlay":"B","tree":{"af":{"ok":true}}}],"26":[{"id":"L26-01","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["ag","be","bf","bh","cf","dc","df","ed","ef","fe"],"W":["bg","ce","dd","de","ee"],"toPlay":"B","tree":{"cd":{"ok":true}}},{"id":"L26-02","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["dd","df","ec","ef","fd","fe","ib"],"W":["de","ed","ee","ia"],"toPlay":"B","tree":{"ce":{"ok":true}}},{"id":"L26-03","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["cb","da","dc","dd","ea","ee","fb","fc","gf","he","hg"],"W":["db","eb","ec","ed","hf"],"toPlay":"B","tree":{"fd":{"ok":true}}},{"id":"L26-04","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["ad","ah","be","cf","ei","gi"],"W":["ae","af","ag","bf","fi"],"toPlay":"B","tree":{"bg":{"ok":true}}},{"id":"L26-05","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["be","bf","cd","de","df","dg","ee","eh","fe","fh","gf"],"W":["ce","cf","ef","eg","ff","fg"],"toPlay":"B","tree":{"gg":{"ok":true}}},{"id":"L26-06","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["bh","bi","cg","dh","ee","fc","ff","gb","gf","hc","hd","he"],"W":["ch","ci","fe","gc","gd","ge"],"toPlay":"B","tree":{"fd":{"ok":true}}},{"id":"L26-07","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["de","dg","ef","eh","fc","ff","gd","ge","gg"],"W":["ee","eg","fd","fe","fg"],"toPlay":"B","tree":{"ed":{"ok":true}}},{"id":"L26-08","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["de","ed","ef","fd","fg","ge","hd","he","ic"],"W":["ee","fe","ff","id","ie"],"toPlay":"B","tree":{"gf":{"ok":true}}},{"id":"L26-09","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["ch","dh","ei","gh","hg","if"],"W":["ci","di","hh","ig","ih","ii"],"toPlay":"B","tree":{"hi":{"ok":true}}},{"id":"L26-10","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["ab","cb","da","db","ea","ec"],"W":["aa","ba","ca","eb"],"toPlay":"B","tree":{"bb":{"ok":true}}},{"id":"L26-11","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["dc","dd","ee","fc","fd","fh","fi","gf","hf","hh","hi","ig"],"W":["ec","ed","gg","gh","gi","hg"],"toPlay":"B","tree":{"fg":{"ok":true}}},{"id":"L26-12","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["ce","cf","dd","dg","ed","eg","fd","fe","gc","hd","he"],"W":["de","df","ee","ef","gd","ge"],"toPlay":"B","tree":{"ff":{"ok":true}}},{"id":"L26-13","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["ch","ci","dg","ei","gc","ge","hb","hf","ic","id","ie"],"W":["dh","di","hc","hd","he"],"toPlay":"B","tree":{"gd":{"ok":true}}},{"id":"L26-14","level":26,"title":"おおきいほうを とろう","hint":"とれる 石が 2つ あるよ。たくさん とれるのは どっち？","size":9,"B":["bh","cg","ci","gg","gh","he","hi","if","ig","ih"],"W":["ch","hf","hg","hh"],"toPlay":"B","tree":{"gf":{"ok":true}}}],"27":[{"id":"L27-01","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["bd","ea","ee","gd","id"],"W":["hd"],"toPlay":"B","tree":{"hc":{"ok":true},"he":{"ok":true}}},{"id":"L27-02","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["da","dc","eg"],"W":["db","ei"],"toPlay":"B","tree":{"cb":{"ok":true},"eb":{"ok":true}}},{"id":"L27-03","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["bh","fc","gb"],"W":["ah","cf"],"toPlay":"B","tree":{"ag":{"ok":true}}},{"id":"L27-04","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["ab","cg","dc","hi"],"W":["gi","ig"],"toPlay":"B","tree":{"gh":{"ok":true},"fi":{"ok":true}}},{"id":"L27-05","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["ch","db","he","id"],"W":["ca","de","hd"],"toPlay":"B","tree":{"hc":{"ok":true},"gd":{"ok":true}}},{"id":"L27-06","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["bh","dh","fi","hi"],"W":["ch"],"toPlay":"B","tree":{"cg":{"ok":true},"ci":{"ok":true}}},{"id":"L27-07","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["ah","ci","gg","hh","id"],"W":["ab","gh"],"toPlay":"B","tree":{"fh":{"ok":true},"gi":{"ok":true}}},{"id":"L27-08","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["fe","he","ia","ii"],"W":["dc","ge"],"toPlay":"B","tree":{"gd":{"ok":true},"gf":{"ok":true}}},{"id":"L27-09","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["ab","cb","ef","gh"],"W":["bb","ha"],"toPlay":"B","tree":{"ba":{"ok":true},"bc":{"ok":true}}},{"id":"L27-10","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["bf","gi"],"W":["af","fi"],"toPlay":"B","tree":{"ae":{"ok":true},"ag":{"ok":true}}},{"id":"L27-11","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["de","ef","ia","ih"],"W":["ai","df","gh"],"toPlay":"B","tree":{"cf":{"ok":true},"dg":{"ok":true}}},{"id":"L27-12","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["bf","bh"],"W":["bg","dd","hd"],"toPlay":"B","tree":{"ag":{"ok":true},"cg":{"ok":true}}},{"id":"L27-13","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["bc","ff","hc","hf"],"W":["dc","gf"],"toPlay":"B","tree":{"ge":{"ok":true},"gg":{"ok":true}}},{"id":"L27-14","level":27,"title":"アタリに しよう","hint":"しろの 石の まわりで あいている ところを かぞえてみよう","size":9,"B":["ba","dh","eb"],"W":["ea","ge","ih"],"toPlay":"B","tree":{"da":{"ok":true},"fa":{"ok":true}}}],"28":[{"id":"L28-01","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["ca","de","ei"],"W":["ce","ch","da","df","ee"],"toPlay":"B","tree":{"dd":{"ok":true}}},{"id":"L28-02","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["af","ga"],"W":["ae","ag","bc","ia"],"toPlay":"B","tree":{"bf":{"ok":true}}},{"id":"L28-03","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["ac","gb","ig"],"W":["ab","ad","gf","hg"],"toPlay":"B","tree":{"bc":{"ok":true}}},{"id":"L28-04","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["be","gf","hc","id"],"W":["ae","ah","bd","ce"],"toPlay":"B","tree":{"bf":{"ok":true}}},{"id":"L28-05","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["ad","db","ge"],"W":["ca","cd","fe","gf","he"],"toPlay":"B","tree":{"gd":{"ok":true}}},{"id":"L28-06","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["hb","hg"],"W":["de","gg","hh","ig"],"toPlay":"B","tree":{"hf":{"ok":true}}},{"id":"L28-07","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["fd"],"W":["ci","ed","ei","fc","gd","hg"],"toPlay":"B","tree":{"fe":{"ok":true}}},{"id":"L28-08","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["af","gi"],"W":["ae","ag","dc"],"toPlay":"B","tree":{"bf":{"ok":true}}},{"id":"L28-09","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["bc","bi","ii"],"W":["ac","bb","cc","gc"],"toPlay":"B","tree":{"bd":{"ok":true}}},{"id":"L28-10","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["ec","ha"],"W":["dc","eb","fc","ga"],"toPlay":"B","tree":{"ed":{"ok":true}}},{"id":"L28-11","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["ai","bg","eb","ff"],"W":["fe","fg","gf"],"toPlay":"B","tree":{"ef":{"ok":true}}},{"id":"L28-12","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["ac","dd","ff"],"W":["ab","ad","ai","gf"],"toPlay":"B","tree":{"bc":{"ok":true}}},{"id":"L28-13","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["fd","ie"],"W":["db","id","if"],"toPlay":"B","tree":{"he":{"ok":true}}},{"id":"L28-14","level":28,"title":"アタリから にげよう","hint":"くろの 石が アタリだよ。あいている ほうへ のびよう","size":9,"B":["ba","hg","ib"],"W":["dd","dg","gg","hf","ig"],"toPlay":"B","tree":{"hh":{"ok":true}}}],"29":[{"id":"L29-01","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["db","hc","ib","ie"],"W":["ed","fi","gg","ic","id"],"toPlay":"B","tree":{"hd":{"ok":true}}},{"id":"L29-02","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["ci","fg","gf","gi","hg","hh"],"W":["ag","gg","gh"],"toPlay":"B","tree":{"fh":{"ok":true}}},{"id":"L29-03","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["ac","af","bd","ch","ea","hh"],"W":["ad","ae","ii"],"toPlay":"B","tree":{"be":{"ok":true}}},{"id":"L29-04","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["cb","de","ei","fh","gb","gc","hi"],"W":["ba","fi","gi"],"toPlay":"B","tree":{"gh":{"ok":true}}},{"id":"L29-05","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["bi","di","ef","fe","fg","ge","gg"],"W":["bb","ff","gf"],"toPlay":"B","tree":{"hf":{"ok":true}}},{"id":"L29-06","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["aa","ah","ba","de","gf","gg","he","hh","if"],"W":["hf","hg"],"toPlay":"B","tree":{"ig":{"ok":true}}},{"id":"L29-07","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["bb","ca","ih"],"W":["aa","ba","fh","hc","hi"],"toPlay":"B","tree":{"ab":{"ok":true}}},{"id":"L29-08","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["bd","be","cc","cf","dd","ga","hb"],"W":["ah","cd","ce","ei"],"toPlay":"B","tree":{"de":{"ok":true}}},{"id":"L29-09","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["fd","ge","hc","he","hi","id"],"W":["ac","bc","gd","hd"],"toPlay":"B","tree":{"gc":{"ok":true}}},{"id":"L29-10","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["dc","eb","ed","fd","gc"],"W":["ba","ec","fc","ig"],"toPlay":"B","tree":{"fb":{"ok":true}}},{"id":"L29-11","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["bd","ce","dc","de","ed","gc"],"W":["ba","cd","dd"],"toPlay":"B","tree":{"cc":{"ok":true}}},{"id":"L29-12","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["ch","dg","di","eb","eg","ei","fe"],"W":["dh","eh","ie"],"toPlay":"B","tree":{"fh":{"ok":true}}},{"id":"L29-13","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["ab","cd","ce","df","ed","ee"],"W":["ah","dd","de","fa","gb"],"toPlay":"B","tree":{"dc":{"ok":true}}},{"id":"L29-14","level":29,"title":"つながった 石を とろう","hint":"つながった 石は いっしょに とれるよ。あいている ところは どこかな","size":9,"B":["bh","ed","fh","ga","gg","gi","hb","hg","ih"],"W":["gh","hh"],"toPlay":"B","tree":{"hi":{"ok":true}}}],"30":[{"id":"L30-01","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["ed","hd","hi","ic","ih"],"W":["bd","fc","id"],"toPlay":"B","tree":{"ie":{"ok":true}}},{"id":"L30-02","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["cb","dc","eb"],"W":["ac","ad","db","fh"],"toPlay":"B","tree":{"da":{"ok":true}}},{"id":"L30-03","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["af","bg","cf","fg","gb","hi"],"W":["bf","fh","gg"],"toPlay":"B","tree":{"be":{"ok":true}}},{"id":"L30-04","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["ch","di","eh"],"W":["dh","ec","gf"],"toPlay":"B","tree":{"dg":{"ok":true}}},{"id":"L30-05","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["ab","bd","eg"],"W":["aa","ff","fh"],"toPlay":"B","tree":{"ba":{"ok":true}}},{"id":"L30-06","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["ab","cc","ha"],"W":["aa","ci","ie"],"toPlay":"B","tree":{"ba":{"ok":true}}},{"id":"L30-07","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["dh","ei","gc","ie"],"W":["cc","di"],"toPlay":"B","tree":{"ci":{"ok":true}}},{"id":"L30-08","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["af","ah","eg","ge","gh","hi","ih"],"W":["ac","hh"],"toPlay":"B","tree":{"hg":{"ok":true}}},{"id":"L30-09","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["bg","eh","fg","fi","ic"],"W":["fh","hc"],"toPlay":"B","tree":{"gh":{"ok":true}}},{"id":"L30-10","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["af","be","cb","cf"],"W":["bf","hf"],"toPlay":"B","tree":{"bg":{"ok":true}}},{"id":"L30-11","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["ce","cg","df","hc"],"W":["cf","gc"],"toPlay":"B","tree":{"bf":{"ok":true}}},{"id":"L30-12","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["fa","ff","ha"],"W":["bf","ca","cg","ga","ge"],"toPlay":"B","tree":{"gb":{"ok":true}}},{"id":"L30-13","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["dc","dg","ed","fc"],"W":["ab","ec","he"],"toPlay":"B","tree":{"eb":{"ok":true}}},{"id":"L30-14","level":30,"title":"しろい 石を とろう","hint":"あかい わの 石は、あと 1か所 ふさげば とれるよ","size":9,"B":["af","ah","gb","ge"],"W":["ag","eb","he","ie"],"toPlay":"B","tree":{"bg":{"ok":true}}}]};
+</script>
+<script>
+(() => {
+'use strict';
+const { Board, BLACK, WHITE } = GoEngine;
+const $ = id => document.getElementById(id);
+const CONFIG = { perLevel: 10, pass: 8, reportUrl: '' }; // reportUrl: GASのURL（ステップ後半で設定）
+
+/* ---------- 級 ---------- */
+const LEVELS = []; for (let l = 30; l >= 1; l--) LEVELS.push(l); LEVELS.push(0); // 0 = 初段
+const lvHTML = l => l > 0 ? `${l}<ruby>級<rt>きゅう</rt></ruby>` : `<ruby>初段<rt>しょだん</rt></ruby>`;
+const lvText = l => l > 0 ? `${l}級` : '初段';
+function theme(l) {
+  if (l >= 26) return '石を とる';
+  if (l >= 21) return 'とりあい';
+  if (l >= 16) return 'いきる・しぬ';
+  if (l >= 11) return '9ろばんで うつ';
+  if (l >= 6) return 'てすじ';
+  if (l >= 1) return 'ふせき・ヨセ';
+  return 'そつぎょう';
+}
+
+/* ---------- きろく（端末内） ---------- */
+const KEY = 'kokubuIgo.v1';
+let store = { kids: [], current: null };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.kids)) store = s; } catch (_) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (_) {} };
+const me = () => store.kids.find(k => k.id === store.current);
+
+function report(kid, level) {
+  if (!CONFIG.reportUrl) return;
+  try {
+    fetch(CONFIG.reportUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ name: kid.name, level: lvText(level), date: new Date().toISOString() }) });
+  } catch (_) {}
+}
+
+/* ---------- 画面 ---------- */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+  const k = me();
+  $('whoBtn').hidden = !k || id === 'sKids';
+  if (k) $('whoBtn').textContent = k.name + ' ▾';
+  window.scrollTo(0, 0);
+}
+
+/* ---------- 名前えらび ---------- */
+let editMode = false;
+function renderKids() {
+  const list = $('kidList'); list.innerHTML = '';
+  store.kids.forEach(k => {
+    const d = document.createElement('div'); d.className = 'kid';
+    d.innerHTML = `<div class="nm"></div><div class="lv">${lvHTML(k.level)}</div>`;
+    d.querySelector('.nm').textContent = k.name;
+    d.onclick = () => { store.current = k.id; save(); openMenu(); };
+    if (editMode) {
+      const x = document.createElement('button'); x.className = 'del'; x.textContent = 'けす';
+      x.onclick = e => { e.stopPropagation();
+        if (x.dataset.sure) { store.kids = store.kids.filter(z => z !== k); if (store.current === k.id) store.current = null; save(); renderKids(); }
+        else { x.dataset.sure = 1; x.textContent = 'ほんとうに けす'; } };
+      d.appendChild(x);
+    }
+    list.appendChild(d);
+  });
+  const add = document.createElement('div'); add.className = 'kid add'; add.textContent = '＋ なまえを ついか';
+  add.onclick = () => { $('addBox').hidden = false; $('nameIn').focus(); };
+  list.appendChild(add);
+  if (store.kids.length) {
+    const ed = document.createElement('div'); ed.className = 'kid add'; ed.textContent = editMode ? 'おわる' : 'なまえを けす';
+    ed.onclick = () => { editMode = !editMode; renderKids(); };
+    list.appendChild(ed);
+  }
+  $('addBox').hidden = store.kids.length > 0;
+}
+$('addOk').onclick = () => {
+  const name = $('nameIn').value.trim(); if (!name) return;
+  const k = { id: 'k' + Date.now(), name, level: 30, stats: {} };
+  store.kids.push(k); store.current = k.id; save(); $('nameIn').value = ''; openMenu();
+};
+$('nameIn').addEventListener('keydown', e => { if (e.key === 'Enter') $('addOk').click(); });
+$('whoBtn').onclick = () => { editMode = false; renderKids(); show('sKids'); };
+
+/* ---------- メニュー ---------- */
+function openMenu() {
+  const k = me(); if (!k) { renderKids(); return show('sKids'); }
+  $('mName').textContent = k.name + ' さんは いま';
+  $('mLevel').innerHTML = lvHTML(k.level);
+  $('mTheme').textContent = 'テーマ：' + theme(k.level);
+  const lad = $('ladder'); lad.innerHTML = '';
+  LEVELS.forEach(l => { const i = document.createElement('i'); if (l > k.level) i.className = 'done'; if (l === k.level) i.className = 'cur'; lad.appendChild(i); });
+  const n = (PROBLEMS[k.level] || []).length;
+  $('goQuiz').disabled = n < CONFIG.perLevel;
+  $('goQuiz').textContent = n < CONFIG.perLevel ? 'この きゅうの もんだいは じゅんびちゅう' : 'もんだいを とく';
+  $('mInfo').textContent = `${CONFIG.perLevel}もん中 ${CONFIG.pass}もん せいかいで つぎの きゅうへ`;
+  show('sMenu');
+}
+$('goQuiz').onclick = startQuiz;
+
+/* ---------- もんだい ---------- */
+let Q = null; // いまの セッション
+function startQuiz() {
+  const k = me(), bank = PROBLEMS[k.level] || [];
+  const list = bank.slice().sort(() => Math.random() - .5).slice(0, CONFIG.perLevel);
+  Q = { level: k.level, list, i: 0, results: [] };
+  show('sQuiz'); loadProblem();
+}
+function loadProblem() {
+  const p = Q.list[Q.i], sym = p.noRotate ? 0 : Math.floor(Math.random() * 8);
+  const { board: b, tree, view } = boardFromProblem(p, sym);
+  Q.board = b; Q.start = b.snapshot(); Q.tree = tree; Q.node = Q.tree; Q.view = view;
+  Q.state = 'play'; Q.missed = false; Q.mark = null; Q.circle = null; Q.hint = false; Q.p = p;
+  $('qLv').innerHTML = lvHTML(Q.level);
+  $('qNo').textContent = `${Q.i + 1} / ${Q.list.length}`;
+  $('qTitle').textContent = p.title;
+  $('qTurn').textContent = (b.turn === BLACK ? 'くろ' : 'しろ') + 'の ばんです';
+  dots(); msg('どこに うつかな？'); buttons(); drawQ();
+}
+function drawQ() { drawBoard($('qBoard'), Q.board, { atari: Q.hint, mark: Q.mark, circle: Q.circle, view: Q.view }); }
+function dots() {
+  const d = $('qDots'); d.innerHTML = '';
+  Q.list.forEach((_, k) => { const i = document.createElement('i'); const r = Q.results[k]; if (r === true) i.className = 'ok'; else if (r === false) i.className = 'ng'; if (k === Q.i) i.classList.add('cur'); d.appendChild(i); });
+}
+function msg(t, kind) { const m = $('qMsg'); m.textContent = t; m.className = 'msg' + (kind ? ' ' + kind : ''); }
+function buttons() {
+  $('qHint').hidden = Q.state !== 'play';
+  $('qRetry').hidden = Q.state !== 'wrong';
+  $('qNext').hidden = Q.state === 'play' || Q.state === 'wait';
+  $('qNext').textContent = Q.i === Q.list.length - 1 ? 'けっかを みる' : 'つぎへ';
+}
+$('qBoard').addEventListener('click', e => {
+  if (!Q || Q.state !== 'play') return;
+  const b = Q.board, i = pointAt($('qBoard'), b, e, Q.view); if (i < 0 || b.get(i)) return;
+  const key = toSgf(b, i), node = Q.node[key];
+  const r = b.play(i);
+  if (!r.ok) { sound('ng'); msg(r.reason === 'ko' ? 'コウだよ。そこは まだ うてないよ' : 'そこは うてないよ', 'warn'); return; }
+  if (!node) { // まちがい
+    sound('ng'); Q.mark = i; Q.state = 'wrong';
+    if (!Q.missed) { Q.missed = true; Q.results[Q.i] = false; }
+    msg('ざんねん！ もういちど かんがえてみよう', 'warn'); dots(); buttons(); drawQ(); return;
+  }
+  sound(r.captured.length ? 'ok' : 'stone');
+  if (node.ok) {
+    Q.state = 'done'; Q.circle = i;
+    if (!Q.missed) Q.results[Q.i] = true;
+    msg(Q.missed ? 'できたね！（つぎは 1かいで できるかな）' : 'せいかい！', 'good'); dots(); buttons(); drawQ(); return;
+  }
+  // あいての こたえ
+  Q.state = 'wait'; buttons(); drawQ();
+  setTimeout(() => { b.play(toIdx(b, node.reply)); sound('stone'); Q.node = node.next || {}; Q.state = 'play'; msg('つぎは どこに うつ？'); buttons(); drawQ(); }, 500);
+});
+$('qRetry').onclick = () => { Q.board.restore(Q.start); Q.board.history = []; Q.node = Q.tree; Q.mark = null; Q.state = 'play'; msg('どこに うつかな？'); buttons(); drawQ(); };
+$('qHint').onclick = () => { Q.hint = true; msg(Q.p.hint || 'よく みてみよう', 'hint'); drawQ(); };
+$('qNext').onclick = () => {
+  if (Q.results[Q.i] === undefined) Q.results[Q.i] = false;
+  if (Q.i < Q.list.length - 1) { Q.i++; loadProblem(); } else finishQuiz();
+};
+$('qQuit').onclick = openMenu;
+
+function finishQuiz() {
+  const k = me(), ok = Q.results.filter(x => x).length, pass = ok >= CONFIG.pass;
+  const st = k.stats[Q.level] || { tries: 0, best: 0 };
+  st.tries++; st.best = Math.max(st.best, ok); k.stats[Q.level] = st;
+  $('rLv').innerHTML = lvHTML(Q.level) + ' の けっか';
+  $('rScore').innerHTML = `${ok}<small> / ${Q.list.length}</small>`;
+  $('rStars').textContent = ok >= 10 ? '★★★' : ok >= 8 ? '★★☆' : ok >= 5 ? '★☆☆' : '☆☆☆';
+  if (pass) {
+    const idx = LEVELS.indexOf(Q.level);
+    const next = LEVELS[Math.min(idx + 1, LEVELS.length - 1)];
+    const graduated = Q.level === 0;
+    if (!graduated) k.level = next;
+    save(); report(k, k.level);
+    $('rMsg').textContent = graduated ? 'しょだん ごうかく！' : 'ごうかく！ しょうきゅう です！';
+    $('rAgain').textContent = 'にんていしょうを みる';
+    $('rAgain').onclick = () => cert(k, graduated ? 0 : next);
+    sound('fan'); confetti();
+  } else {
+    save();
+    $('rMsg').textContent = `あと ${CONFIG.pass - ok}もんで ごうかく！`;
+    $('rAgain').textContent = 'もういちど ちょうせん';
+    $('rAgain').onclick = startQuiz;
+  }
+  show('sResult');
+}
+$('rMenu').onclick = openMenu;
+
+function cert(k, level) {
+  $('cName').textContent = k.name + ' さん';
+  $('cLevel').innerHTML = lvHTML(level);
+  const d = new Date();
+  $('cDate').textContent = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日　国分アンビシャス広場`;
+  show('sCert'); confetti();
+}
+$('cOk').onclick = openMenu;
+function confetti() {
+  const box = document.createElement('div'); box.className = 'confetti';
+  const colors = ['#2f8f5b', '#e0a526', '#e5483f', '#4a90d9', '#f2c94c'];
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement('i');
+    c.style.left = Math.random() * 100 + 'vw'; c.style.background = colors[i % 5];
+    c.style.animationDuration = 1.6 + Math.random() * 1.6 + 's'; c.style.animationDelay = Math.random() * .6 + 's';
+    box.appendChild(c);
+  }
+  document.body.appendChild(box); setTimeout(() => box.remove(), 4000);
+}
+
+/* ---------- コンピュータと うつ ---------- */
+const CPU_LV = [
+  { key: 'weak', name: 'よわい', sub: 'はじめての ひとに', icon: '🐣', bg: '#fdf0c8', need: 30 },
+  { key: 'normal', name: 'ふつう', sub: '20級から', icon: '🐶', bg: '#e3f4ea', need: 20 },
+  { key: 'strong', name: 'つよい', sub: '11級から', icon: '🦁', bg: '#fde3dc', need: 11 },
+];
+let worker = null, wSeq = 0; const wWait = {};
+function cpuCall(msg) {
+  return new Promise(res => {
+    if (worker === null) {
+      try { worker = new Worker(URL.createObjectURL(new Blob([$('cpuSrc').textContent], { type: 'text/javascript' }))); worker.onmessage = e => { const f = wWait[e.data.id]; delete wWait[e.data.id]; f && f(e.data); }; }
+      catch (_) { worker = false; }
+    }
+    if (worker) { const id = ++wSeq; wWait[id] = res; worker.postMessage({ ...msg, id }); }
+    else setTimeout(() => res(msg.type === 'think' ? GoCPU.think(msg.n, msg.grid, msg.ko, msg.color, msg.level, msg.oppPassed, msg.komi) : GoCPU.estimate(msg.n, msg.grid, msg.ko, msg.color, msg.komi)), 30);
+  });
+}
+function renderPicks() {
+  const k = me(), box = $('picks'); box.innerHTML = '';
+  const rec = (k.stats.cpu || {});
+  CPU_LV.forEach(L => {
+    const open = k.level <= L.need, r = rec[L.key] || { w: 0, l: 0 };
+    const b = document.createElement('button'); b.className = 'pick' + (open ? '' : ' lock');
+    b.innerHTML = `<span class="ic" style="background:${L.bg}">${open ? L.icon : '🔒'}</span><span><div class="nm">${L.name}</div><div class="sb">${open ? `かち ${r.w}・まけ ${r.l}` : L.sub + ' あそべるよ'}</div></span>`;
+    if (open) b.onclick = () => startCpu(L.key);
+    box.appendChild(b);
+  });
+  show('sCpuPick');
+}
+$('goCpu').onclick = renderPicks;
+$('cpBack').onclick = openMenu;
+let C = null;
+function startCpu(level) {
+  C = { level, board: new Board(9), state: 'kid', terr: null, dead: null };
+  $('cPlayBtns').hidden = false; $('cEndBtns').hidden = true;
+  cMsg('すきな ところに うってね'); cDraw(); show('sCpu');
+}
+function cMsg(t, kind, thinking) { const m = $('cMsg'); m.innerHTML = ''; m.append(t); if (thinking) { const d = document.createElement('span'); d.className = 'think'; m.append(d); } m.className = 'msg' + (kind ? ' ' + kind : ''); }
+function cDraw() {
+  const b = C.board;
+  drawBoard($('cBoard'), b, { atari: C.state !== 'count' && me().level >= 21, terr: C.terr, dead: C.dead });
+  $('cStone').className = 'st ' + (b.turn === BLACK ? 'b' : 'w');
+  $('cTurn').textContent = C.state === 'count' ? 'おしまい' : b.turn === BLACK ? 'あなたの ばん' : 'コンピュータの ばん';
+  $('cCapB').textContent = b.captures[BLACK]; $('cCapW').textContent = b.captures[WHITE];
+}
+$('cBoard').addEventListener('click', e => {
+  if (!C || C.state !== 'kid') return;
+  const b = C.board, i = pointAt($('cBoard'), b, e); if (i < 0) return;
+  const r = b.play(i);
+  if (!r.ok) { if (r.reason === 'suicide') { cMsg('そこは うてないよ', 'warn'); sound('ng'); } else if (r.reason === 'ko') { cMsg('コウだよ。ほかに 1かい うってからね', 'warn'); sound('ng'); } return; }
+  sound(r.captured.length ? 'ok' : 'stone');
+  if (r.captured.length) cMsg(`${r.captured.length}こ とったよ！`, 'good');
+  cDraw(); cpuTurn(false);
+});
+async function cpuTurn(oppPassed) {
+  C.state = 'cpu'; cDraw();
+  const t0 = Date.now(), my = C;
+  if (!oppPassed && !$('cMsg').classList.contains('good')) cMsg('コンピュータが かんがえちゅう', '', true);
+  const b = C.board;
+  const res = await cpuCall({ type: 'think', n: 9, grid: Array.from(b.grid), ko: b.ko, color: WHITE, level: C.level, oppPassed, komi: 0 });
+  await new Promise(r => setTimeout(r, Math.max(0, 450 - (Date.now() - t0))));
+  if (C !== my) return;
+  if (res.pass) {
+    b.pass();
+    if (b.passes >= 2) return countGame();
+    cMsg('コンピュータは パスしたよ。おわりなら パスか かぞえる');
+  } else {
+    const r = b.play(res.move);
+    if (!r.ok) { b.pass(); cMsg('コンピュータは パスしたよ'); }
+    else { sound('stone'); if (r.captured.length) cMsg(`${r.captured.length}こ とられた！`, 'warn'); else cMsg('あなたの ばんだよ'); }
+  }
+  C.state = 'kid'; cDraw();
+}
+$('cPass').onclick = () => { if (C.state !== 'kid') return; C.board.pass(); if (C.board.passes >= 2) countGame(); else { cMsg('パスしたよ'); cpuTurn(true); } };
+$('cUndo').onclick = () => { if (C.state !== 'kid') return; const b = C.board; if (b.history.length >= 2) { b.undo(); b.undo(); cMsg('2て もどしたよ'); cDraw(); } };
+$('cCount').onclick = () => { if (C.state === 'kid') countGame(); };
+async function countGame() {
+  C.state = 'count'; cMsg('かぞえています', '', true); cDraw();
+  const b = C.board, my = C;
+  const e = await cpuCall({ type: 'estimate', n: 9, grid: Array.from(b.grid), ko: b.ko, color: b.turn, komi: 0 });
+  if (C !== my) return;
+  C.terr = e.terr; C.dead = e.dead;
+  const win = e.black > e.white, draw = e.black === e.white;
+  const k = me(), cs = k.stats.cpu = k.stats.cpu || {}, r = cs[C.level] = cs[C.level] || { w: 0, l: 0 };
+  if (win) r.w++; else if (!draw) r.l++; save();
+  cMsg(`くろ ${e.black}・しろ ${e.white}　${win ? 'あなたの かち！' : draw ? 'ひきわけ' : 'コンピュータの かち'}`, win ? 'good' : draw ? '' : 'warn');
+  if (win) { sound('fan'); confetti(); }
+  $('cPlayBtns').hidden = true; $('cEndBtns').hidden = false; cDraw();
+}
+$('cAgain').onclick = () => startCpu(C.level);
+$('cOther').onclick = renderPicks;
+$('cQuit').onclick = () => { C = null; openMenu(); };
+
+/* ---------- じゆうに うつ ---------- */
+let F, fHover = -1;
+function fNew(n) { F = new Board(n); fMsg('すきな ところに 石を おいてね'); fDraw(); }
+function fMsg(t, kind) { const m = $('fMsg'); m.textContent = t; m.className = 'msg' + (kind ? ' ' + kind : ''); }
+function fDraw() {
+  drawBoard($('fBoard'), F, { atari: true, hover: fHover });
+  $('fStone').className = 'st ' + (F.turn === BLACK ? 'b' : 'w');
+  $('fTurn').textContent = F.turn === BLACK ? 'くろの ばん' : 'しろの ばん';
+  $('fCapB').textContent = F.captures[BLACK]; $('fCapW').textContent = F.captures[WHITE];
+}
+$('fBoard').addEventListener('click', e => {
+  const i = pointAt($('fBoard'), F, e); if (i < 0) return;
+  const r = F.play(i);
+  if (!r.ok) { if (r.reason === 'suicide') { fMsg('そこは うてないよ（石が すぐ とられる ばしょ）', 'warn'); sound('ng'); } else if (r.reason === 'ko') { fMsg('コウだよ。ほかに 1かい うってからね', 'warn'); sound('ng'); } return; }
+  if (r.captured.length) { fMsg(`${r.captured.length}こ とったよ！`, 'good'); sound('ok'); } else { fMsg('すきな ところに 石を おいてね'); sound('stone'); }
+  fHover = -1; fDraw();
+});
+$('fBoard').addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; const i = pointAt($('fBoard'), F, e); if (i !== fHover) { fHover = i; fDraw(); } });
+$('fBoard').addEventListener('pointerleave', () => { fHover = -1; fDraw(); });
+$('fUndo').onclick = () => { if (F.undo()) { fMsg('ひとつ もどしたよ'); fDraw(); } };
+$('fPass').onclick = () => { F.pass(); fMsg(F.passes >= 2 ? 'ふたりとも パスしたので おしまい' : 'パスしたよ'); fDraw(); };
+$('fReset').onclick = () => fNew(F.size);
+$('fSize').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; [...$('fSize').children].forEach(x => x.classList.toggle('on', x === b)); fNew(+b.dataset.s); });
+$('goFree').onclick = () => { fNew(9); [...$('fSize').children].forEach(x => x.classList.toggle('on', x.dataset.s === '9')); show('sFree'); };
+$('fBack').onclick = openMenu;
+
+if (location.hash === '#test') window.__app = { get Q() { return Q; }, get P() { return PROBLEMS; } };
+/* ---------- 追加の問題（problems-extra.json） ---------- */
+function mergeExtra(extra) {
+  for (const lv in extra) { const ids = new Set((PROBLEMS[lv] || []).map(p => p.id)); PROBLEMS[lv] = (PROBLEMS[lv] || []).concat((extra[lv] || []).filter(p => !ids.has(p.id))); }
+}
+async function loadExtra() {
+  try { const r = await fetch('problems-extra.json', { cache: 'no-store' }); if (r.ok) { mergeExtra(await r.json()); if ($('sMenu').classList.contains('on')) openMenu(); } } catch (_) {}
+}
+/* ---------- はじめ ---------- */
+if (me()) openMenu(); else { renderKids(); show('sKids'); }
+loadExtra();
+})();
+</script>
+</body>
+</html>

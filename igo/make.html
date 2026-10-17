@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>問題をつくる｜国分アンビシャス囲碁アプリ</title>
+<style>
+:root{--bg:#f6f3ec;--ink:#2f2a22;--sub:#76695a;--card:#fff;--line:#e3dccd;--accent:#2f8f5b;--warn:#c9443e}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;font-size:14px;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1100px;margin:0 auto;padding:12px 16px 40px}
+h1{font-size:18px;margin:0 0 2px}.lead{color:var(--sub);font-size:12px;margin:0 0 12px}
+.play{display:flex;flex-direction:column;gap:12px}
+@media (min-width:880px){.play{flex-direction:row;align-items:flex-start}.side{width:380px;flex:none}.boardbox{position:sticky;top:12px}}
+.boardbox{flex:1;min-width:0}
+.boardcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px}
+svg.board{display:block;width:100%;height:auto;touch-action:manipulation;user-select:none}
+.side{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.card h2{font-size:14px;margin:0 0 8px}
+.lbl{font-size:12px;color:var(--sub);margin:8px 0 4px;display:block}
+.seg{display:flex;background:var(--bg);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;border-radius:8px;padding:8px 0;font-weight:700;color:var(--sub);cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--accent);color:#fff}
+.row{display:flex;gap:8px;align-items:center}
+input[type=text],select,textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff}
+textarea{min-height:90px;font-family:ui-monospace,monospace;font-size:12px}
+.btn{border:0;border-radius:10px;padding:10px 8px;font-weight:700;cursor:pointer;background:#ece5d6;white-space:nowrap;flex:1}
+.btn.main{background:var(--accent);color:#fff}.btn.warn{background:#f6dcda;color:var(--warn)}
+.btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.msg{padding:10px;border-radius:10px;background:var(--bg);font-weight:700;text-align:center;color:var(--sub)}
+.msg.good{background:#e3f4ea;color:var(--accent)}.msg.warn{background:#fbe5e3;color:var(--warn)}
+.list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto;margin-top:8px}
+.item{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+.item .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .lv{font-weight:700;color:var(--accent);width:42px;flex:none}
+.item button{border:0;background:var(--bg);border-radius:8px;padding:6px 8px;cursor:pointer;flex:none}
+.note{font-size:12px;color:var(--sub);line-height:1.6;margin:6px 0 0}
+.status{font-size:12px;margin-top:8px;color:var(--sub)}
+.status b{color:var(--ink)}
+ol.steps{margin:0;padding-left:20px;line-height:1.7;font-size:13px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>問題をつくる</h1>
+  <p class="lead">国分アンビシャス囲碁アプリ｜作成者用</p>
+  <div class="play">
+    <div class="boardbox"><div class="boardcard"><svg class="board" id="mb"></svg></div></div>
+    <div class="side">
+      <div class="msg" id="msg">「石をおく」で初めの形を作ってください</div>
+
+      <div class="card">
+        <div class="seg" id="mode"><button data-m="setup" class="on">1. 石をおく</button><button data-m="answer">2. 正解をいれる</button><button data-m="test">3. ためす</button></div>
+        <div id="pSetup">
+          <span class="lbl">おく石</span>
+          <div class="seg" id="stone"><button data-c="1" class="on">黒</button><button data-c="2">白</button><button data-c="0">けす</button></div>
+          <div class="btns"><button class="btn warn" id="clearAll">石をぜんぶけす</button></div>
+        </div>
+        <div id="pAnswer" hidden>
+          <p class="note">先手の正解→相手の応手→…と交互にタップ。最後は先手の手で終えます。別の正解は「はじめから」で入れ直すと分岐として追加されます。</p>
+          <div class="btns"><button class="btn" id="aUndo">1手もどる</button><button class="btn" id="aRestart">はじめから</button><button class="btn warn" id="aClear">正解をぜんぶけす</button></div>
+          <div class="status" id="aStatus"></div>
+        </div>
+        <div id="pTest" hidden>
+          <div class="btns"><button class="btn main" id="tRetry">もういちど</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>問題の設定</h2>
+        <div class="row">
+          <div style="flex:1"><span class="lbl">盤</span><div class="seg" id="size"><button data-s="9" class="on">9路</button><button data-s="13">13路</button><button data-s="19">19路</button></div></div>
+          <div style="flex:1"><span class="lbl">手番</span><div class="seg" id="toPlay"><button data-p="B" class="on">黒先</button><button data-p="W">白先</button></div></div>
+        </div>
+        <span class="lbl">級</span><select id="level"></select>
+        <span class="lbl">タイトル（ひらがな中心）</span><input type="text" id="title" placeholder="れい：いきるには どこ？">
+        <span class="lbl">ヒント</span><input type="text" id="hint" placeholder="れい：目を 2つ つくろう">
+        <div class="btns"><button class="btn main" id="save">この問題をリストに入れる</button><button class="btn" id="newP">あたらしい問題</button></div>
+      </div>
+
+      <div class="card">
+        <h2>作った問題 <span id="cnt" style="color:var(--sub);font-weight:400"></span></h2>
+        <div class="list" id="list"></div>
+        <div class="btns"><button class="btn main" id="dl">problems-extra.json を保存</button><button class="btn" id="copy">JSONをコピー</button></div>
+        <p class="note">保存したファイルを GitHub の igo フォルダに上げると、アプリに反映されます（同じ名前で上書き）。</p>
+      </div>
+
+      <div class="card">
+        <h2>よみこむ</h2>
+        <textarea id="imp" placeholder="Claude が作ったJSON（1問）か、problems-extra.json の中身を貼りつけ"></textarea>
+        <div class="btns"><button class="btn" id="impBtn">よみこむ</button></div>
+      </div>
+
+      <div class="card">
+        <h2>写真から作る</h2>
+        <ol class="steps">
+          <li>下の「指示文をコピー」を押す</li>
+          <li>Claude に問題の写真と指示文を送る</li>
+          <li>返ってきたJSONを「よみこむ」に貼る</li>
+          <li>「3. ためす」で正しいか確かめ、級・タイトルを直して保存</li>
+        </ol>
+        <div class="btns"><button class="btn" id="promptBtn">指示文をコピー</button></div>
+        <p class="note">市販の本の問題は公開しないでください（自作か著作権切れの問題のみ）。</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// 国分アンビシャス囲碁アプリ — ルールエンジン
+// 盤面: 0=空, 1=黒, 2=白
+const GoEngine = (() => {
+  const EMPTY = 0, BLACK = 1, WHITE = 2;
+  const other = c => (c === BLACK ? WHITE : BLACK);
+
+  class Board {
+    constructor(size = 9) {
+      this.size = size;
+      this.grid = new Int8Array(size * size);
+      this.ko = -1;          // コウで打てない点
+      this.turn = BLACK;
+      this.captures = { [BLACK]: 0, [WHITE]: 0 }; // 取った石の数
+      this.history = [];     // まった用
+      this.lastMove = -1;
+      this.passes = 0;
+    }
+    idx(x, y) { return y * this.size + x; }
+    xy(i) { return [i % this.size, Math.floor(i / this.size)]; }
+    get(i) { return this.grid[i]; }
+    neighbors(i) {
+      const s = this.size, x = i % s, y = (i / s) | 0, n = [];
+      if (x > 0) n.push(i - 1);
+      if (x < s - 1) n.push(i + 1);
+      if (y > 0) n.push(i - s);
+      if (y < s - 1) n.push(i + s);
+      return n;
+    }
+    // つながった石とダメ（呼吸点）
+    group(i) {
+      const color = this.grid[i];
+      const stones = [], libs = new Set(), seen = new Set([i]);
+      const stack = [i];
+      while (stack.length) {
+        const p = stack.pop();
+        stones.push(p);
+        for (const q of this.neighbors(p)) {
+          const c = this.grid[q];
+          if (c === EMPTY) libs.add(q);
+          else if (c === color && !seen.has(q)) { seen.add(q); stack.push(q); }
+        }
+      }
+      return { color, stones, libs };
+    }
+    snapshot() {
+      return { grid: this.grid.slice(), ko: this.ko, turn: this.turn,
+        captures: { ...this.captures }, lastMove: this.lastMove, passes: this.passes };
+    }
+    restore(s) {
+      this.grid = s.grid.slice(); this.ko = s.ko; this.turn = s.turn;
+      this.captures = { ...s.captures }; this.lastMove = s.lastMove; this.passes = s.passes;
+    }
+    // 打てるか確認だけ（盤面は変えない）
+    check(i, color = this.turn) {
+      if (i < 0 || i >= this.grid.length) return { ok: false, reason: 'outside' };
+      if (this.grid[i] !== EMPTY) return { ok: false, reason: 'occupied' };
+      if (i === this.ko) return { ok: false, reason: 'ko' };
+      const s = this.snapshot();
+      const r = this._place(i, color);
+      this.restore(s);
+      return r;
+    }
+    _place(i, color) {
+      this.grid[i] = color;
+      const captured = [];
+      for (const q of this.neighbors(i)) {
+        if (this.grid[q] === other(color)) {
+          const g = this.group(q);
+          if (g.libs.size === 0) for (const st of g.stones) {
+            if (this.grid[st] !== EMPTY) { this.grid[st] = EMPTY; captured.push(st); }
+          }
+        }
+      }
+      const mine = this.group(i);
+      if (mine.libs.size === 0) { this.grid[i] = EMPTY; return { ok: false, reason: 'suicide' }; }
+      // 単純コウ: 1子取りで、打った石が1子・ダメ1つ
+      this.ko = (captured.length === 1 && mine.stones.length === 1 && mine.libs.size === 1)
+        ? captured[0] : -1;
+      this.captures[color] += captured.length;
+      return { ok: true, captured };
+    }
+    play(i, color = this.turn) {
+      const c = this.check(i, color);
+      if (!c.ok) return c;
+      this.history.push(this.snapshot());
+      const r = this._place(i, color);
+      this.lastMove = i; this.turn = other(color); this.passes = 0;
+      return r;
+    }
+    pass() {
+      this.history.push(this.snapshot());
+      this.ko = -1; this.lastMove = -1; this.turn = other(this.turn); this.passes++;
+    }
+    undo() {
+      if (!this.history.length) return false;
+      this.restore(this.history.pop());
+      return true;
+    }
+    // アタリ（ダメ1つ）の石の一覧
+    atariStones() {
+      const res = new Set(), seen = new Set();
+      for (let i = 0; i < this.grid.length; i++) {
+        if (this.grid[i] === EMPTY || seen.has(i)) continue;
+        const g = this.group(i);
+        g.stones.forEach(s => seen.add(s));
+        if (g.libs.size === 1) g.stones.forEach(s => res.add(s));
+      }
+      return res;
+    }
+  }
+  return { Board, EMPTY, BLACK, WHITE, other };
+})();
+if (typeof module !== 'undefined') module.exports = GoEngine;
+
+</script>
+<script>
+// 国分アンビシャス囲碁アプリ — 盤の表示・共通部品（app と make で共用）
+const SVGNS = 'http://www.w3.org/2000/svg';
+function starPoints(n) {
+  if (n === 9) return [[2, 2], [2, 6], [6, 2], [6, 6], [4, 4]];
+  const a = 3, b = n - 4, c = (n - 1) / 2;
+  return n === 13 ? [[a, a], [a, b], [b, a], [b, b], [c, c]]
+    : [[a, a], [a, b], [b, a], [b, b], [c, c], [a, c], [c, a], [b, c], [c, b]];
+}
+function fullView(n) { return { x0: 0, y0: 0, x1: n - 1, y1: n - 1 }; }
+// 石と答えの まわりだけを 見せる（9路は ぜんぶ）
+function autoView(board, extra = []) {
+  const n = board.size; if (n <= 9) return fullView(n);
+  let x0 = n, y0 = n, x1 = -1, y1 = -1;
+  const add = i => { const [x, y] = board.xy(i); x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); };
+  for (let i = 0; i < n * n; i++) if (board.get(i)) add(i);
+  extra.forEach(add);
+  if (x1 < 0) return fullView(n);
+  x0 -= 2; y0 -= 2; x1 += 2; y1 += 2;
+  if (x0 <= 2) x0 = 0; if (y0 <= 2) y0 = 0; if (x1 >= n - 3) x1 = n - 1; if (y1 >= n - 3) y1 = n - 1;
+  const grow = (a, b) => { while (b - a < 6) { if (a > 0) a--; if (b - a < 6 && b < n - 1) b++; } return [a, b]; };
+  [x0, x1] = grow(x0, x1); [y0, y1] = grow(y0, y1);
+  return { x0, y0, x1, y1 };
+}
+function geomOf(board, view) {
+  const v = view || fullView(board.size);
+  const cols = v.x1 - v.x0 + 1, rows = v.y1 - v.y0 + 1, m = Math.max(cols, rows);
+  const cell = m <= 9 ? 44 : m <= 13 ? 32 : 24, pad = cell * .8;
+  return { v, cell, pad, Wd: pad * 2 + cell * (cols - 1), Ht: pad * 2 + cell * (rows - 1) };
+}
+function drawBoard(svg, board, opt = {}) {
+  const n = board.size, { v, cell, pad, Wd, Ht } = geomOf(board, opt.view);
+  const px = x => pad + (x - v.x0) * cell, py = y => pad + (y - v.y0) * cell;
+  const el = (t, a) => { const e = document.createElementNS(SVGNS, t); for (const k in a) e.setAttribute(k, a[k]); svg.appendChild(e); return e; };
+  const id = svg.id;
+  svg.setAttribute('viewBox', `0 0 ${Wd} ${Ht}`); svg.innerHTML = '';
+  el('defs', {}).innerHTML = `
+    <radialGradient id="${id}gb" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#6b6b6b"/><stop offset=".55" stop-color="#151515"/></radialGradient>
+    <radialGradient id="${id}gw" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset=".7" stop-color="#e4e4e4"/><stop offset="1" stop-color="#c9c9c9"/></radialGradient>
+    <linearGradient id="${id}k" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ecc77e"/><stop offset="1" stop-color="#d9a957"/></linearGradient>`;
+  el('rect', { width: Wd, height: Ht, rx: cell * .3, fill: `url(#${id}k)` });
+  const sw = Math.max(1, cell / 32);
+  const lx0 = v.x0 === 0 ? px(v.x0) : px(v.x0) - cell * .6, lx1 = v.x1 === n - 1 ? px(v.x1) : px(v.x1) + cell * .6;
+  const ly0 = v.y0 === 0 ? py(v.y0) : py(v.y0) - cell * .6, ly1 = v.y1 === n - 1 ? py(v.y1) : py(v.y1) + cell * .6;
+  for (let y = v.y0; y <= v.y1; y++) el('line', { x1: lx0, y1: py(y), x2: lx1, y2: py(y), stroke: '#5a4020', 'stroke-width': (y === 0 || y === n - 1) ? sw * 2 : sw });
+  for (let x = v.x0; x <= v.x1; x++) el('line', { x1: px(x), y1: ly0, x2: px(x), y2: ly1, stroke: '#5a4020', 'stroke-width': (x === 0 || x === n - 1) ? sw * 2 : sw });
+  starPoints(n).forEach(([x, y]) => { if (x >= v.x0 && x <= v.x1 && y >= v.y0 && y <= v.y1) el('circle', { cx: px(x), cy: py(y), r: cell * .09, fill: '#5a4020' }); });
+  const r = cell * .47, atari = opt.atari ? board.atariStones() : new Set(), labels = opt.labels || {};
+  for (let i = 0; i < n * n; i++) {
+    const c = board.get(i), [x, y] = board.xy(i);
+    if (x < v.x0 || x > v.x1 || y < v.y0 || y > v.y1) continue;
+    if (c) {
+      el('circle', { cx: px(x) + cell * .04, cy: py(y) + cell * .06, r, fill: 'rgba(0,0,0,.25)' });
+      el('circle', { cx: px(x), cy: py(y), r, fill: `url(#${id}${c === GoEngine.BLACK ? 'gb' : 'gw'})` });
+      if (atari.has(i)) el('circle', { cx: px(x), cy: py(y), r: r * 1.02, fill: 'none', stroke: '#e5483f', 'stroke-width': cell * .09 });
+      if (i === board.lastMove && labels[i] == null) el('circle', { cx: px(x), cy: py(y), r: r * .32, fill: 'none', stroke: c === GoEngine.BLACK ? '#fff' : '#222', 'stroke-width': cell * .06 });
+    }
+    if (labels[i] != null) {
+      const t = el('text', { x: px(x), y: py(y) + cell * .17, 'text-anchor': 'middle', 'font-size': cell * .46, 'font-weight': 800,
+        fill: c === GoEngine.BLACK ? '#fff' : c === GoEngine.WHITE ? '#222' : '#c0392b', 'font-family': 'sans-serif' });
+      t.textContent = labels[i];
+    }
+  }
+  if (opt.terr) for (let i = 0; i < n * n; i++) { // 地のしるし
+    const o = opt.terr[i], [x, y] = board.xy(i);
+    if (!o || (board.get(i) && !(opt.dead && opt.dead.includes(i))) || x < v.x0 || x > v.x1 || y < v.y0 || y > v.y1) continue;
+    const s = cell * .32; el('rect', { x: px(x) - s / 2, y: py(y) - s / 2, width: s, height: s, rx: s * .15, fill: o === GoEngine.BLACK ? '#1a1a1a' : '#fff', stroke: '#555', 'stroke-width': cell * .03 });
+  }
+  if (opt.dead) opt.dead.forEach(i => { const [x, y] = board.xy(i); if (x >= v.x0 && x <= v.x1 && y >= v.y0 && y <= v.y1) el('circle', { cx: px(x), cy: py(y), r, fill: '#e2b96a', opacity: .55 }); });
+  const mark = (i, f) => { if (i == null || i < 0) return; const [x, y] = board.xy(i); if (x < v.x0 || x > v.x1 || y < v.y0 || y > v.y1) return; f(px(x), py(y)); };
+  mark(opt.mark, (X, Y) => { const d = cell * .28; el('path', { d: `M${X - d} ${Y - d}L${X + d} ${Y + d}M${X + d} ${Y - d}L${X - d} ${Y + d}`, stroke: '#e5483f', 'stroke-width': cell * .12, 'stroke-linecap': 'round' }); });
+  mark(opt.circle, (X, Y) => el('circle', { cx: X, cy: Y, r: cell * .3, fill: 'none', stroke: '#2f8f5b', 'stroke-width': cell * .1 }));
+  if (opt.hover != null && opt.hover >= 0 && !board.get(opt.hover))
+    mark(opt.hover, (X, Y) => el('circle', { cx: X, cy: Y, r, fill: (opt.hoverColor || board.turn) === GoEngine.BLACK ? '#111' : '#fff', opacity: .4 }));
+}
+function pointAt(svg, board, e, view) {
+  const { v, cell, pad, Wd, Ht } = geomOf(board, view), rect = svg.getBoundingClientRect();
+  const x = Math.round(((e.clientX - rect.left) * Wd / rect.width - pad) / cell) + v.x0;
+  const y = Math.round(((e.clientY - rect.top) * Ht / rect.height - pad) / cell) + v.y0;
+  return (x < v.x0 || y < v.y0 || x > v.x1 || y > v.y1) ? -1 : board.idx(x, y);
+}
+// 8とおりの まわし・うらがえし
+function tf(sym, s, n) {
+  let x = s.charCodeAt(0) - 97, y = s.charCodeAt(1) - 97;
+  if (sym & 4) [x, y] = [y, x];
+  if (sym & 1) x = n - 1 - x;
+  if (sym & 2) y = n - 1 - y;
+  return String.fromCharCode(97 + x) + String.fromCharCode(97 + y);
+}
+function tfTree(t, sym, n) {
+  const o = {};
+  for (const k in t) { const v = t[k]; o[tf(sym, k, n)] = { ...v, ...(v.reply ? { reply: tf(sym, v.reply, n) } : {}), ...(v.next ? { next: tfTree(v.next, sym, n) } : {}) }; }
+  return o;
+}
+const toIdx = (b, s) => b.idx(s.charCodeAt(0) - 97, s.charCodeAt(1) - 97);
+const toSgf = (b, i) => { const [x, y] = b.xy(i); return String.fromCharCode(97 + x) + String.fromCharCode(97 + y); };
+function treeKeys(t, out = []) { for (const k in t) { out.push(k); if (t[k].reply) out.push(t[k].reply); if (t[k].next) treeKeys(t[k].next, out); } return out; }
+// 問題データから盤をつくる
+function boardFromProblem(p, sym = 0) {
+  const n = p.size, b = new GoEngine.Board(n);
+  p.B.forEach(s => b.grid[toIdx(b, tf(sym, s, n))] = GoEngine.BLACK);
+  p.W.forEach(s => b.grid[toIdx(b, tf(sym, s, n))] = GoEngine.WHITE);
+  b.turn = p.toPlay === 'W' ? GoEngine.WHITE : GoEngine.BLACK;
+  const tree = tfTree(p.tree, sym, n);
+  return { board: b, tree, view: autoView(b, treeKeys(tree).map(k => toIdx(b, k))) };
+}
+let _ac;
+function sound(type) {
+  try {
+    _ac = _ac || new (window.AudioContext || window.webkitAudioContext)();
+    const ac = _ac, t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    if (type === 'stone') { o.type = 'triangle'; o.frequency.setValueAtTime(900, t); o.frequency.exponentialRampToValueAtTime(300, t + .05); g.gain.setValueAtTime(.35, t); g.gain.exponentialRampToValueAtTime(.001, t + .09); o.start(t); o.stop(t + .1); }
+    else if (type === 'ok') { o.type = 'sine'; [660, 880, 1320].forEach((f, k) => o.frequency.setValueAtTime(f, t + k * .08)); g.gain.setValueAtTime(.25, t); g.gain.exponentialRampToValueAtTime(.001, t + .35); o.start(t); o.stop(t + .36); }
+    else if (type === 'fan') { o.type = 'sine'; [523, 659, 784, 1047, 784, 1047].forEach((f, k) => o.frequency.setValueAtTime(f, t + k * .12)); g.gain.setValueAtTime(.25, t); g.gain.setValueAtTime(.25, t + .6); g.gain.exponentialRampToValueAtTime(.001, t + .9); o.start(t); o.stop(t + .9); }
+    else { o.type = 'square'; o.frequency.setValueAtTime(180, t); g.gain.setValueAtTime(.12, t); g.gain.exponentialRampToValueAtTime(.001, t + .2); o.start(t); o.stop(t + .21); }
+  } catch (_) {}
+}
+
+</script>
+<script>
+(() => {
+'use strict';
+const { Board, BLACK, WHITE, EMPTY } = GoEngine;
+const $ = id => document.getElementById(id);
+const KEY = 'kokubuIgo.maker.v1';
+const PROMPT = `添付した囲碁の問題の写真を、次の形式のJSONにしてください。JSONだけを出力してください。
+・座標は左上を "aa" とし、右へ a,b,c…、下へ a,b,c… と数える2文字（SGF形式）
+・写真が19路盤の一部（隅など）なら、盤の端の位置に注意して19路盤の座標で書く
+・"size": 盤のサイズ（9・13・19）
+・"B": 黒石の座標の配列、"W": 白石の座標の配列
+・"toPlay": 先に打つ方（"B" か "W"）
+・"tree": 正解手順。最後の手は {"座標": {"ok": true}}。相手の応手が続くときは {"座標": {"reply": "応手の座標", "next": { 同じ形 }}}。正解が複数あれば並べる
+・"title": 子ども向けのタイトル（ひらがな中心）、"hint": 子ども向けのヒント
+例：{"size":9,"B":["cc","dc"],"W":["cd","dd"],"toPlay":"B","tree":{"ce":{"ok":true}},"title":"しろを とろう","hint":"アタリに なっている 石は どれ？"}`;
+
+let st = { list: [] };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.list)) st = s; } catch (_) {}
+const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (_) {} };
+
+// 級のえらびかた
+for (let l = 30; l >= 0; l--) { const o = document.createElement('option'); o.value = l; o.textContent = l ? `${l}級` : '初段'; $('level').appendChild(o); }
+$('level').value = 20;
+
+let size = 9, toPlay = 'B', mode = 'setup', stoneColor = BLACK;
+let setup = new Board(9), tree = {}, editId = null;
+let R, moves = [], cur, pending; // 正解入力
+let T, tNode, tState, tMark, tCircle; // ためす
+let hover = -1;
+const svg = $('mb');
+
+function msg(t, k) { $('msg').textContent = t; $('msg').className = 'msg' + (k ? ' ' + k : ''); }
+const colorOf = p => p === 'W' ? WHITE : BLACK;
+function cloneSetup() { const b = new Board(size); b.grid = setup.grid.slice(); b.turn = colorOf(toPlay); return b; }
+
+/* ---- 正解の木 ---- */
+function sync() {
+  cur = tree; pending = null;
+  moves.forEach((i, k) => {
+    const key = toSgf(R, i);
+    if (k % 2 === 0) pending = cur[key]; else { cur = pending.next; pending = null; }
+  });
+}
+function lines(t, depth = 1) { // 手順の数と最長
+  let n = 0, max = 0, bad = 0;
+  for (const k in t) {
+    const v = t[k];
+    if (v.ok) { n++; max = Math.max(max, depth); }
+    else if (v.reply && v.next && Object.keys(v.next).length) { const r = lines(v.next, depth + 2); n += r.n; max = Math.max(max, r.max); bad += r.bad; }
+    else bad++;
+  }
+  return { n, max, bad };
+}
+function aStatus() {
+  const r = lines(tree);
+  $('aStatus').innerHTML = r.n ? `正解の手順：<b>${r.n}とおり</b>（いちばん長くて${r.max}手）` + (r.bad ? '　<b style="color:var(--warn)">相手の手で終わっている手順があります</b>' : '') : '正解はまだありません';
+}
+
+/* ---- 描く ---- */
+function draw() {
+  if (mode === 'setup') drawBoard(svg, setup, { hover, hoverColor: stoneColor || BLACK });
+  else if (mode === 'answer') { const labels = {}; moves.forEach((i, k) => labels[i] = k + 1); drawBoard(svg, R, { labels, hover }); }
+  else drawBoard(svg, T.board, { view: T.view, mark: tMark, circle: tCircle });
+}
+function setMode(m) {
+  mode = m;
+  [...$('mode').children].forEach(b => b.classList.toggle('on', b.dataset.m === m));
+  $('pSetup').hidden = m !== 'setup'; $('pAnswer').hidden = m !== 'answer'; $('pTest').hidden = m !== 'test';
+  if (m === 'setup') msg('「石をおく」で初めの形を作ってください');
+  if (m === 'answer') { R = cloneSetup(); moves = []; sync(); aStatus(); msg((toPlay === 'B' ? '黒' : '白') + 'の正解をタップ'); }
+  if (m === 'test') {
+    if (!lines(tree).n) { msg('先に正解を入れてください', 'warn'); return setMode('answer'); }
+    startTest();
+  }
+  draw();
+}
+$('mode').onclick = e => { const b = e.target.closest('button'); if (b) setMode(b.dataset.m); };
+$('stone').onclick = e => { const b = e.target.closest('button'); if (!b) return; stoneColor = +b.dataset.c; [...$('stone').children].forEach(x => x.classList.toggle('on', x === b)); };
+$('size').onclick = e => {
+  const b = e.target.closest('button'); if (!b || +b.dataset.s === size) return;
+  size = +b.dataset.s; [...$('size').children].forEach(x => x.classList.toggle('on', x === b));
+  setup = new Board(size); tree = {}; setMode('setup');
+};
+$('toPlay').onclick = e => { const b = e.target.closest('button'); if (!b) return; toPlay = b.dataset.p; [...$('toPlay').children].forEach(x => x.classList.toggle('on', x === b)); tree = {}; if (mode !== 'setup') setMode(mode); };
+$('clearAll').onclick = () => { setup = new Board(size); tree = {}; draw(); };
+
+/* ---- タップ ---- */
+svg.addEventListener('click', e => {
+  const view = mode === 'test' ? T.view : null;
+  const brd = mode === 'setup' ? setup : mode === 'answer' ? R : T.board;
+  const i = pointAt(svg, brd, e, view); if (i < 0) return;
+  if (mode === 'setup') {
+    setup.grid[i] = setup.grid[i] === stoneColor ? EMPTY : stoneColor;
+    if (Object.keys(tree).length) msg('石を変えました。正解も確かめ直してください', 'warn');
+    draw(); return;
+  }
+  if (mode === 'answer') {
+    if (R.get(i)) return;
+    const key = toSgf(R, i), attacker = R.turn === colorOf(toPlay);
+    if (!attacker) {
+      if (pending.reply && pending.reply !== key) { msg('相手の応手は1つだけ入れられます（' + pending.reply + '）', 'warn'); return; }
+    }
+    const r = R.play(i); if (!r.ok) { msg('そこは打てません', 'warn'); return; }
+    if (attacker) { if (!cur[key]) cur[key] = { ok: true }; pending = cur[key]; msg('相手の応手をタップ（ここで終わりならそのまま）'); }
+    else { if (pending.ok) { delete pending.ok; pending.reply = key; pending.next = {}; } cur = pending.next; pending = null; msg('つぎの正解をタップ'); }
+    moves.push(i); aStatus(); draw(); return;
+  }
+  // ためす
+  if (tState !== 'play' || T.board.get(i)) return;
+  const node = tNode[toSgf(T.board, i)], r = T.board.play(i);
+  if (!r.ok) { msg('そこは打てません', 'warn'); return; }
+  if (!node) { tMark = i; tState = 'end'; msg('×（正解にない手）', 'warn'); sound('ng'); draw(); return; }
+  if (node.ok) { tCircle = i; tState = 'end'; msg('○ 正解！', 'good'); sound('ok'); draw(); return; }
+  tState = 'wait'; draw();
+  setTimeout(() => { T.board.play(toIdx(T.board, node.reply)); tNode = node.next; tState = 'play'; msg('つぎは？'); draw(); }, 400);
+});
+svg.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || mode === 'test') return;
+  const i = pointAt(svg, mode === 'setup' ? setup : R, e); if (i !== hover) { hover = i; draw(); }
+});
+svg.addEventListener('pointerleave', () => { hover = -1; draw(); });
+
+$('aUndo').onclick = () => {
+  if (!moves.length) return;
+  const i = moves.pop(), key = toSgf(R, i), wasAttacker = moves.length % 2 === 0;
+  R.undo(); sync();
+  if (wasAttacker) { const n = cur[key]; if (n && n.ok) delete cur[key]; }
+  else if (pending && pending.next && !Object.keys(pending.next).length) { delete pending.reply; delete pending.next; pending.ok = true; }
+  aStatus(); msg('1手もどしました'); draw();
+};
+$('aRestart').onclick = () => { R = cloneSetup(); moves = []; sync(); msg('別の正解を入れるときは、はじめからタップ'); draw(); };
+$('aClear').onclick = () => { tree = {}; R = cloneSetup(); moves = []; sync(); aStatus(); msg('正解をけしました'); draw(); };
+
+function current() {
+  const B = [], W = [];
+  for (let i = 0; i < size * size; i++) { if (setup.grid[i] === BLACK) B.push(toSgf(setup, i)); if (setup.grid[i] === WHITE) W.push(toSgf(setup, i)); }
+  const lv = +$('level').value;
+  return { id: editId || `M${lv}-${Date.now().toString(36)}`, level: lv, title: $('title').value.trim() || 'もんだい', hint: $('hint').value.trim(),
+    size, B, W, toPlay, tree: JSON.parse(JSON.stringify(tree)), source: 'manual' };
+}
+function startTest() {
+  const p = current(); T = boardFromProblem(p, 0); tNode = T.tree; tState = 'play'; tMark = tCircle = null;
+  msg('解いてみてください。相手は自動で打ちます');
+}
+$('tRetry').onclick = () => { startTest(); draw(); };
+
+/* ---- 保存・リスト ---- */
+function loadProblem(p) {
+  size = p.size; toPlay = p.toPlay || 'B'; editId = p.id || null;
+  setup = new Board(size); p.B.forEach(s => setup.grid[toIdx(setup, s)] = BLACK); p.W.forEach(s => setup.grid[toIdx(setup, s)] = WHITE);
+  tree = JSON.parse(JSON.stringify(p.tree || {}));
+  [...$('size').children].forEach(x => x.classList.toggle('on', +x.dataset.s === size));
+  [...$('toPlay').children].forEach(x => x.classList.toggle('on', x.dataset.p === toPlay));
+  if (p.level != null) $('level').value = p.level;
+  $('title').value = p.title || ''; $('hint').value = p.hint || '';
+  setMode('test');
+}
+function renderList() {
+  const box = $('list'); box.innerHTML = '';
+  $('cnt').textContent = `${st.list.length}問`;
+  st.list.slice().sort((a, b) => b.level - a.level).forEach(p => {
+    const d = document.createElement('div'); d.className = 'item';
+    d.innerHTML = `<span class="lv">${p.level ? p.level + '級' : '初段'}</span><span class="t"></span><button data-a="open">ひらく</button><button data-a="del">けす</button>`;
+    d.querySelector('.t').textContent = `${p.title}（${p.size}路）`;
+    d.onclick = e => {
+      const a = e.target.dataset.a;
+      if (a === 'open') loadProblem(p);
+      if (a === 'del') { if (e.target.dataset.sure) { st.list = st.list.filter(x => x !== p); persist(); renderList(); } else { e.target.dataset.sure = 1; e.target.textContent = 'ほんとうに'; } }
+    };
+    box.appendChild(d);
+  });
+}
+$('save').onclick = () => {
+  const p = current(), r = lines(p.tree);
+  if (!p.B.length && !p.W.length) return msg('石がありません', 'warn');
+  if (!r.n || r.bad) return msg('正解の手順を入れてください（最後は先手の手で終える）', 'warn');
+  const k = st.list.findIndex(x => x.id === p.id);
+  if (k >= 0) st.list[k] = p; else st.list.push(p);
+  editId = p.id; persist(); renderList(); msg('リストに入れました', 'good');
+};
+$('newP').onclick = () => { editId = null; setup = new Board(size); tree = {}; $('title').value = ''; $('hint').value = ''; setMode('setup'); };
+function exportJson() {
+  const out = {};
+  st.list.forEach(p => { (out[p.level] = out[p.level] || []).push(p); });
+  return JSON.stringify(out);
+}
+$('dl').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([exportJson()], { type: 'application/json' }));
+  a.download = 'problems-extra.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+async function copyText(t, done) { try { await navigator.clipboard.writeText(t); msg(done, 'good'); } catch (_) { $('imp').value = t; msg('コピーできなかったので「よみこむ」欄に出しました', 'warn'); } }
+$('copy').onclick = () => copyText(exportJson(), 'JSONをコピーしました');
+$('promptBtn').onclick = () => copyText(PROMPT, '指示文をコピーしました。Claude に写真と一緒に送ってください');
+$('impBtn').onclick = () => {
+  let t = $('imp').value.trim().replace(/^```(json)?/, '').replace(/```$/, '').trim(), d;
+  try { d = JSON.parse(t); } catch (_) { return msg('JSONとして読めませんでした', 'warn'); }
+  if (Array.isArray(d.B) && Array.isArray(d.W)) {
+    if (![9, 13, 19].includes(d.size)) return msg('size は 9・13・19 のどれかにしてください', 'warn');
+    loadProblem({ ...d, id: null }); $('imp').value = ''; return msg('よみこみました。ためして正しいか確かめてください', 'good');
+  }
+  let n = 0;
+  for (const lv in d) (Array.isArray(d[lv]) ? d[lv] : []).forEach(p => { const k = st.list.findIndex(x => x.id === p.id); if (k >= 0) st.list[k] = p; else st.list.push(p); n++; });
+  persist(); renderList(); $('imp').value = ''; msg(`${n}問をリストに入れました`, 'good');
+};
+
+renderList(); setMode('setup');
+if (location.hash === '#test') window.__mk = { get tree() { return tree; } };
+})();
+</script>
+</body>
+</html>
