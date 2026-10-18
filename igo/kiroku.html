@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>進み具合｜国分アンビシャス囲碁アプリ</title>
+<style>
+:root{--bg:#fbf6ea;--ink:#3b2f22;--sub:#7a6a55;--card:#fffdf7;--line:#e8dcc4;--accent:#2f8f5b;--warn:#c9443e;--gold:#e0a526}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;font-size:14px}
+.wrap{max-width:900px;margin:0 auto;padding:16px 16px 40px}
+h1{font-size:19px;margin:0}.lead{color:var(--sub);font-size:12px;margin:2px 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.login{max-width:360px;margin:40px auto}
+.row{display:flex;gap:8px}
+input{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:16px;background:#fff}
+button{border:0;border-radius:10px;padding:12px 16px;font:inherit;font-weight:700;background:var(--accent);color:#fff;cursor:pointer;white-space:nowrap}
+button.sub{background:#efe4cc;color:var(--ink)}
+.err{color:var(--warn);font-weight:700;margin-top:8px;min-height:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;font-size:24px}.stat span{font-size:12px;color:var(--sub)}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;color:var(--sub);font-weight:600;text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.lv{font-weight:800;color:var(--accent);white-space:nowrap}
+td.nm{font-weight:700}
+.bar{height:6px;background:#eadfc8;border-radius:3px;margin-top:4px;width:90px}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--accent)}
+.muted{color:var(--sub);font-size:12px}
+.chip{display:inline-block;font-size:11px;border-radius:999px;padding:2px 8px;margin:1px 2px 1px 0;background:#f1eadb;white-space:nowrap}
+.new{background:#fff3cd;color:#8a6500}
+.log{list-style:none;margin:0;padding:0}
+.log li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.log li:last-child{border:0}
+.log .d{color:var(--sub);width:86px;flex:none;font-size:12px;padding-top:2px}
+h2{font-size:14px;margin:0 0 8px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+@media (max-width:600px){.hide-sp{display:none}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1>進み具合</h1><p class="lead">国分アンビシャス囲碁アプリ</p></div>
+    <button class="sub" id="reload" hidden>更新</button>
+  </div>
+
+  <div class="card login" id="login">
+    <h2>合言葉を入れてください</h2>
+    <div class="row"><input id="key" type="password" autocomplete="current-password"><button id="go">見る</button></div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div id="main" hidden>
+    <div class="stats">
+      <div class="stat"><b id="sKids">0</b><span>登録した子</span></div>
+      <div class="stat"><b id="sWeek">0</b><span>7日以内に利用</span></div>
+      <div class="stat"><b id="sPromo">0</b><span>7日以内の昇級</span></div>
+    </div>
+    <div class="card">
+      <h2>子どもごとの級</h2>
+      <table>
+        <thead><tr><th>名前</th><th>級</th><th>最後に使った日</th><th class="hide-sp">コンピュータ戦</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p class="muted" id="none" hidden>まだ記録がありません。子どもがアプリを開くと、ここに出てきます。</p>
+    </div>
+    <div class="card">
+      <h2>最近の昇級</h2>
+      <ul class="log" id="log"></ul>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+const URL_ = 'https://script.google.com/macros/s/AKfycbxzHXP7v_xnQgXV8363bhXsW_pillVl-sQxHPI8YQfiArRCkGWn88bC3q6XPi7-00V1/exec';
+const $ = id => document.getElementById(id);
+const lvText = l => l > 0 ? `${l}級` : '初段';
+const day = 864e5;
+function ago(t, now) {
+  if (!t) return '—';
+  const d = new Date(t), n = new Date(now), diff = Math.floor((new Date(n.toDateString()) - new Date(d.toDateString())) / day);
+  return diff <= 0 ? 'きょう' : diff === 1 ? 'きのう' : diff < 30 ? `${diff}日前` : `${d.getMonth() + 1}/${d.getDate()}`;
+}
+const md = t => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; };
+const CPU = { weak: 'よわい', normal: 'ふつう', strong: 'つよい' };
+
+async function load(key) {
+  $('err').textContent = '読みこみ中…';
+  let d;
+  try { d = await (await fetch(URL_ + '?key=' + encodeURIComponent(key))).json(); }
+  catch (_) { $('err').textContent = '読みこめませんでした。通信を確かめてください'; return; }
+  if (!d.ok) { $('err').textContent = d.error === 'locked' ? 'まちがいが多いので、10分ほど待ってください' : '合言葉がちがいます'; try { sessionStorage.removeItem('kk'); } catch (_) {} return; }
+  try { sessionStorage.setItem('kk', key); } catch (_) {}
+  $('err').textContent = ''; $('login').hidden = true; $('main').hidden = false; $('reload').hidden = false;
+  render(d);
+}
+function render(d) {
+  const now = new Date(d.now).getTime();
+  const kids = d.kids.slice().sort((a, b) => a.level - b.level || String(a.name).localeCompare(String(b.name), 'ja'));
+  $('sKids').textContent = kids.length;
+  $('sWeek').textContent = kids.filter(k => now - new Date(k.last).getTime() < 7 * day).length;
+  $('sPromo').textContent = d.log.filter(l => now - new Date(l.at).getTime() < 7 * day).length;
+  const tb = $('rows'); tb.innerHTML = '';
+  kids.forEach(k => {
+    const tr = document.createElement('tr');
+    const pct = Math.round((30 - k.level) / 30 * 100);
+    const cpu = Object.keys(CPU).filter(x => k.cpu && k.cpu[x]).map(x => `<span class="chip">${CPU[x]} ${k.cpu[x].w}勝${k.cpu[x].l}敗</span>`).join('') || '<span class="muted">—</span>';
+    const fresh = k.promoted && now - new Date(k.promoted).getTime() < 7 * day ? ' <span class="chip new">昇級</span>' : '';
+    tr.innerHTML = `<td class="nm"></td><td class="lv">${lvText(k.level)}${fresh}<div class="bar"><i style="width:${pct}%"></i></div></td><td>${ago(k.last, now)}</td><td class="hide-sp">${cpu}</td>`;
+    tr.querySelector('.nm').textContent = k.name;
+    tb.appendChild(tr);
+  });
+  $('none').hidden = kids.length > 0;
+  const lg = $('log'); lg.innerHTML = '';
+  if (!d.log.length) lg.innerHTML = '<li class="muted">まだありません</li>';
+  d.log.slice(0, 20).forEach(l => { const li = document.createElement('li'); li.innerHTML = `<span class="d">${md(l.at)}</span><span><b class="n"></b> が ${lvText(l.level)}に</span>`; li.querySelector('.n').textContent = l.name; lg.appendChild(li); });
+}
+$('go').onclick = () => { const k = $('key').value.trim(); if (k) load(k); };
+$('key').addEventListener('keydown', e => { if (e.key === 'Enter') $('go').click(); });
+$('reload').onclick = () => { let k; try { k = sessionStorage.getItem('kk'); } catch (_) {} if (k) load(k); };
+let saved; try { saved = sessionStorage.getItem('kk'); } catch (_) {}
+if (saved) load(saved);
+})();
+</script>
+</body>
+</html>

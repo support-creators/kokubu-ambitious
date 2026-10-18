@@ -128,7 +128,7 @@ svg.board{display:block;width:100%;height:auto;touch-action:manipulation;user-se
         <p class="label">なまえ（きょうしつでの よびな）</p>
         <div class="row"><input id="nameIn" maxlength="10" placeholder="れい：はると"><button class="btn main" id="addOk">ついか</button></div>
       </div>
-      <p class="note">きろくは この スマホの なかに のこります。</p>
+      <p class="note">きろく（なまえ・きゅう・かちまけ）は きょうしつの せんせいにも とどきます。</p>
     </div>
   </section>
 
@@ -721,7 +721,7 @@ const PROBLEMS = {"21":[{"id":"L21-01","level":21,"title":"しろい 石を と�
 'use strict';
 const { Board, BLACK, WHITE } = GoEngine;
 const $ = id => document.getElementById(id);
-const CONFIG = { perLevel: 10, pass: 8, reportUrl: '' }; // reportUrl: GASのURL（ステップ後半で設定）
+const CONFIG = { perLevel: 10, pass: 8, reportUrl: 'https://script.google.com/macros/s/AKfycbxzHXP7v_xnQgXV8363bhXsW_pillVl-sQxHPI8YQfiArRCkGWn88bC3q6XPi7-00V1/exec' }; // reportUrl: GASのURL（ステップ後半で設定）
 
 /* ---------- 級 ---------- */
 const LEVELS = []; for (let l = 30; l >= 1; l--) LEVELS.push(l); LEVELS.push(0); // 0 = 初段
@@ -744,11 +744,15 @@ try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (_) {} };
 const me = () => store.kids.find(k => k.id === store.current);
 
-function report(kid, level) {
-  if (!CONFIG.reportUrl) return;
+function report(kid, event) { // 進み具合を記録シートへ送る
+  if (!CONFIG.reportUrl || !kid) return;
+  const now = Date.now();
+  if (event === 'open' && kid.sent && now - kid.sent < 30 * 60 * 1000) return; // ひらいたときは30分に1回
+  kid.sent = now; save();
+  const quiz = {}; for (const lv in kid.stats) if (lv !== 'cpu') quiz[lv] = kid.stats[lv];
   try {
     fetch(CONFIG.reportUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ name: kid.name, level: lvText(level), date: new Date().toISOString() }) });
+      body: JSON.stringify({ kid: kid.id, name: kid.name, level: kid.level, cpu: kid.stats.cpu || {}, quiz, event }) }).catch(() => {});
   } catch (_) {}
 }
 
@@ -809,7 +813,7 @@ function openMenu() {
   $('goQuiz').disabled = n < CONFIG.perLevel;
   $('goQuiz').textContent = n < CONFIG.perLevel ? 'この きゅうの もんだいは じゅんびちゅう' : 'もんだいを とく';
   $('mInfo').textContent = `${CONFIG.perLevel}もん中 ${CONFIG.pass}もん せいかいで つぎの きゅうへ`;
-  show('sMenu');
+  show('sMenu'); report(k, 'open');
 }
 $('goQuiz').onclick = startQuiz;
 
@@ -885,7 +889,7 @@ function finishQuiz() {
     const next = LEVELS[Math.min(idx + 1, LEVELS.length - 1)];
     const graduated = Q.level === 0;
     if (!graduated) k.level = next;
-    save(); report(k, k.level);
+    save(); report(k, 'promote');
     $('rMsg').textContent = graduated ? 'しょだん ごうかく！' : 'ごうかく！ しょうきゅう です！';
     $('rAgain').textContent = 'にんていしょうを みる';
     $('rAgain').onclick = () => cert(k, graduated ? 0 : next);
@@ -1004,7 +1008,7 @@ async function countGame() {
   C.terr = e.terr; C.dead = e.dead;
   const win = e.black > e.white, draw = e.black === e.white;
   const k = me(), cs = k.stats.cpu = k.stats.cpu || {}, r = cs[C.level] = cs[C.level] || { w: 0, l: 0 };
-  if (win) r.w++; else if (!draw) r.l++; save();
+  if (win) r.w++; else if (!draw) r.l++; save(); report(k, 'game');
   cMsg(`くろ ${e.black}・しろ ${e.white}　${win ? 'あなたの かち！' : draw ? 'ひきわけ' : 'コンピュータの かち'}`, win ? 'good' : draw ? '' : 'warn');
   if (win) { sound('fan'); confetti(); }
   $('cPlayBtns').hidden = true; $('cEndBtns').hidden = false; cDraw();
