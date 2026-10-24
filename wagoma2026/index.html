@@ -306,7 +306,7 @@
    ▼ 更新するのはここだけ ▼
    STATUS : "plan"（開催予定） / "go"（本日開催） / "delay"（延期）
    ============================================================ */
-const STATUS    = "plan";
+const STATUS    = "delay";
 const RAIN_DATE = "決まり次第お知らせします";   // 例："10月25日（日）"
 const FORM_URL  = "#";                           // Googleフォームの URL
 /* ============================================================ */
@@ -323,6 +323,7 @@ box.innerHTML = `<div class="status ${S[0]}"><span class="lbl">${S[1]}</span><p>
 
 (function(){
   const el = document.getElementById("countdown");
+  if (STATUS === "delay") { el.style.display = "none"; return; }
   const target = new Date("2026-10-24T00:00:00+09:00");
   const now = new Date();
   const days = Math.ceil((target - now) / 86400000);
