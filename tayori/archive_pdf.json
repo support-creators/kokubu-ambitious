@@ -460,32 +460,12 @@
   "pageH": 842
  },
  {
-  "no": 131,
-  "year": 2013,
-  "month": 11,
-  "variant": "日本生命用",
-  "file": "tayori/pdf/131_2013-11-nissei.pdf",
-  "cover": "tayori/cover/131-n.jpg",
-  "pageW": 595,
-  "pageH": 842
- },
- {
   "no": 130,
   "year": 2013,
   "month": 8,
   "variant": "",
   "file": "tayori/pdf/130_2013-08.pdf",
   "cover": "tayori/cover/130.jpg",
-  "pageW": 595,
-  "pageH": 842
- },
- {
-  "no": 130,
-  "year": 2013,
-  "month": 8,
-  "variant": "日本生命用",
-  "file": "tayori/pdf/130_2013-08-nissei.pdf",
-  "cover": "tayori/cover/130-n.jpg",
   "pageW": 595,
   "pageH": 842
  },
