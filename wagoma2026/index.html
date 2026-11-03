@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>第1回 国分アンビシャス杯 和ごま大会｜国分アンビシャス広場</title>
-<meta name="description" content="国分アンビシャス広場25周年記念「第1回 国分アンビシャス杯」和ごま大会。2026年10月24日(土)開催。">
+<meta name="description" content="国分アンビシャス広場25周年記念「第1回 国分アンビシャス杯」和ごま大会。2026年12月19日(土)開催（10月24日から延期）。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Old+Mincho:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
@@ -169,7 +169,7 @@
       <path d="M22 62 Q60 76 98 62" stroke="#1f3a5f" stroke-width="4" fill="none"/>
       <path d="M34 76 Q60 86 86 76" stroke="#a8842c" stroke-width="3" fill="none"/>
     </svg>
-    <p class="date">2026年 <b>10月24日</b>（土）午後</p>
+    <p class="date">2026年 <b>12月19日</b>（土）午後</p>
     <p class="place">国分アンビシャス広場（屋外グラウンド）</p>
     <div class="countdown" id="countdown"></div>
   </div>
@@ -181,7 +181,7 @@
   <section id="status" style="border-top:none; padding-top:10px">
     <h2>開催情報</h2>
     <div id="statusBox"></div>
-    <p style="font-size:.9rem;color:var(--sub);margin:8px 0 0">雨天の場合は延期します。当日の開催可否は、当日朝8時ごろにこの欄とLINEでお知らせします。</p>
+    <p style="font-size:.9rem;color:var(--sub);margin:8px 0 0"><span class="nb">12月19日も雨天の場合は再延期します</span><span class="nb">（日程は後日お知らせします）。</span><span class="nb">当日の開催可否は、</span><span class="nb">当日朝8時ごろに</span><span class="nb">この欄とLINEでお知らせします。</span></p>
   </section>
 
   <!-- ===== ごあいさつ ===== -->
@@ -197,9 +197,9 @@
   <section id="gaiyo">
     <h2>大会概要</h2>
     <dl class="gaiyo">
-      <dt>日時</dt><dd>2026年10月24日（土）<br>12:30 集合 ／ 16:00 前 終了予定</dd>
+      <dt>日時</dt><dd>2026年12月19日（土）<br><span class="nb">（10月24日から延期）</span><br>12:30 集合 ／ 16:00 前 終了予定</dd>
       <dt>会場</dt><dd>国分アンビシャス広場（いつもの広場・屋外の土のグラウンド）</dd>
-      <dt>雨天時</dt><dd>延期 <span class="tbd">予備日は決まり次第掲載</span></dd>
+      <dt>雨天時</dt><dd>再延期<span class="nb">（日程は後日お知らせします）</span></dd>
       <dt>部門</dt><dd>子どもの部 ／ 大人の部<br><span class="nb">（中学生以上・卒業生を含む）</span></dd>
       <dt>競技方法</dt><dd>けんかごまの団体戦<br><span class="nb">（チームは当日くじ引き）</span><br>子どもの部：リーグ戦<br>大人の部：トーナメント<br><span class="nb">最後に両部門の</span><span class="nb">優勝チームで最終戦</span></dd>
       <dt>使用こま</dt><dd>競技用和ごま <b>7号以下</b>（各自持参）</dd>
@@ -275,7 +275,7 @@
     <h2>参加申込み</h2>
     <div class="entry">
       <p class="deadline">お申込みは<b>LINEの投票</b>で</p>
-      <small><span class="nb">広場のLINEの投票で、</span><span class="nb">参加をお知らせください。</span></small>
+      <small><span class="nb">広場のLINEの投票で、</span><span class="nb">参加をお知らせください。</span><br><span class="nb">10月24日の分のお申込みは、</span><span class="nb">そのまま引き継ぎます。</span></small>
     </div>
   </section>
 
@@ -306,16 +306,16 @@
    ▼ 更新するのはここだけ ▼
    STATUS : "plan"（開催予定） / "go"（本日開催） / "delay"（延期）
    ============================================================ */
-const STATUS    = "delay";
-const RAIN_DATE = "決まり次第お知らせします";   // 例："10月25日（日）"
+const STATUS    = "plan";
+const RAIN_DATE = "後日お知らせします";   // 例："10月25日（日）"
 const FORM_URL  = "#";                           // Googleフォームの URL
 /* ============================================================ */
 
 const box = document.getElementById("statusBox");
 const S = {
-  plan : ["st-plan","開催予定","10月24日（土）開催予定です。"],
+  plan : ["st-plan","開催予定",'<span class="nb">10月24日は雨天のため</span><span class="nb">延期し、</span><span class="nb">12月19日（土）に</span><span class="nb">開催します。</span>'],
   go   : ["st-go","本日開催","本日、予定どおり開催します。12:30 までに集合してください。"],
-  delay: ["st-delay","延期","雨天のため延期します。予備日：" + RAIN_DATE]
+  delay: ["st-delay","延期","雨天のため再延期します。日程：" + RAIN_DATE]
 }[STATUS];
 box.innerHTML = `<div class="status ${S[0]}"><span class="lbl">${S[1]}</span><p>${S[2]}</p></div>`;
 
@@ -324,7 +324,7 @@ box.innerHTML = `<div class="status ${S[0]}"><span class="lbl">${S[1]}</span><p>
 (function(){
   const el = document.getElementById("countdown");
   if (STATUS === "delay") { el.style.display = "none"; return; }
-  const target = new Date("2026-10-24T00:00:00+09:00");
+  const target = new Date("2026-12-19T00:00:00+09:00");
   const now = new Date();
   const days = Math.ceil((target - now) / 86400000);
   if (days > 0) el.innerHTML = `大会まで あと <span class="n">${days}</span> 日`;
