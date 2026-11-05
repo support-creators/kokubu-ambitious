@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>先生用ページ｜国分アンビシャス囲碁アプリ</title>
+<style>
+:root{--bg:#fbf6ea;--ink:#3b2f22;--sub:#7a6a55;--card:#fffdf7;--line:#e8dcc4;--accent:#2f8f5b;--gold:#e0a526}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:21px;margin:0 0 4px}
+.lead{color:var(--sub);font-size:13px;margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.card h2{font-size:15px;margin:0 0 10px}
+.links{display:grid;gap:10px}
+a.go{display:flex;flex-direction:column;justify-content:center;min-height:56px;padding:10px 16px;border-radius:12px;background:var(--accent);color:#fff;text-decoration:none;font-weight:800;font-size:16px}
+a.go small{font-weight:500;font-size:12px;opacity:.9}
+a.go.sub{background:#efe4cc;color:var(--ink)}
+a.go.back{background:var(--ink);color:#fff}
+.note{font-size:13px;color:var(--sub);margin:8px 0 0}
+@media (min-width:700px){.links.two{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>先生用ページ</h1>
+  <p class="lead">国分アンビシャス囲碁アプリ v0.5.1 ／ 先生だけが使う入口です。子どもの画面やホームページからはリンクしていません。</p>
+
+  <div class="card">
+    <h2>アプリの先生用画面（本番：igo/index.html）</h2>
+    <div class="links two">
+      <a class="go" href="index.html?sensei=1&amp;open=review">先生用レビュー<small>全1471問の確認・級位承認・コース採用</small></a>
+      <a class="go" href="index.html?sensei=1&amp;open=prog">みんなの れんしゅう 記録（この端末）<small>この端末で練習した子どもの一覧・CSV保存</small></a>
+    </div>
+    <p class="note">ここから開いたタブだけが「先生モード」になり、名前えらび画面・メニューにも先生用ボタンが出ます。同じタブで画面を移っても続きます。終わったら画面上の「先生モードを おわる」を押すか、下の「子どもの画面へ戻る」を押してください（タブを閉じても終わります）。パスワードではないので、このページのアドレスは先生どうしだけで共有してください。</p>
+  </div>
+
+  <div class="card">
+    <h2>そのほかの先生用ページ</h2>
+    <div class="links two">
+      <a class="go sub" href="kiroku.html">記録シートを見る<small>kiroku.html（記録シートに届いた進み具合）</small></a>
+      <a class="go sub" href="make.html">問題づくり<small>make.html</small></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>ためしプレイ版（igo/tameshi.html・記録を送らない）</h2>
+    <div class="links two">
+      <a class="go sub" href="tameshi.html?sensei=1&amp;open=review">ためしプレイ版で 先生用レビュー</a>
+      <a class="go sub" href="tameshi.html?sensei=1&amp;open=prog">ためしプレイ版で れんしゅう 記録</a>
+    </div>
+  </div>
+
+  <div class="links">
+    <a class="go back" href="index.html?sensei=0">子どもの画面へ戻る<small>先生モードを おわって、ふつうの アプリを開きます</small></a>
+  </div>
+  <p class="note">子どもの記録（この端末のブラウザ内）は、先生モードの入り・切りでは変わりません。</p>
+</div>
+</body>
+</html>
