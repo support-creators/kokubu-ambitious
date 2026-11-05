@@ -26,9 +26,19 @@
   <a class="yt" href="https://www.youtube.com/@%E5%9B%BD%E5%88%86%E3%82%A2%E3%83%B3%E3%83%93%E3%82%B7%E3%83%A3%E3%82%B9%E5%BA%83%E5%A0%B4" target="_blank" rel="noopener">▶ YouTube</a>
 </nav>
 
-<!-- ヒーロー画像：images/hero.jpg -->
-<div class="hero-image tall">
-  <div>
+<!-- ヒーロー画像：images/hero/hero-1.jpg〜hero-6.jpg を順番にスライドショー表示（hero-slideshow.js）
+     写真を入れ替えるときは、同じファイル名で上書きするか下の img を編集してください。
+     object-position はスマホで子どもが画面に入るよう写真ごとに調整しています。 -->
+<div class="hero-image tall has-slides">
+  <div class="hero-slides" aria-hidden="true">
+    <img class="is-active" src="images/hero/hero-1.jpg" alt="" width="1600" height="900" fetchpriority="high" decoding="async" style="object-position: 90% 55%;">
+    <img data-src="images/hero/hero-2.jpg" alt="" width="1600" height="900" decoding="async" style="object-position: 78% 15%;">
+    <img data-src="images/hero/hero-3.jpg" alt="" width="1600" height="900" decoding="async" style="object-position: 15% 35%;">
+    <img data-src="images/hero/hero-4.jpg" alt="" width="1600" height="900" decoding="async" style="object-position: 40% 55%;">
+    <img data-src="images/hero/hero-5.jpg" alt="" width="1600" height="900" decoding="async" style="object-position: 25% 50%;">
+    <img data-src="images/hero/hero-6.jpg" alt="" width="1600" height="900" decoding="async" style="object-position: 20% 30%;">
+  </div>
+  <div class="hero-content">
     <div class="eyebrow">KOKUBU AMBITIOUS OPEN SPACE</div>
     <h2>子ども達が楽しく<span style="color:#ffd9a8;">遊び</span>、<br>いろんな<span style="color:#ffd9a8;">体験</span>をしています。</h2>
     <p class="hero-sub">ボランティアの見守りの中、あそびを通して、異年齢の子ども社会を遊びながら学べる地域の居場所です。</p>
@@ -90,5 +100,6 @@
   </div>
 </footer>
 
+<script src="hero-slideshow.js" defer></script>
 </body>
 </html>
