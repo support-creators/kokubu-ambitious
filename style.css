@@ -663,3 +663,30 @@ html.pv-lock, html.pv-lock body { overflow: hidden; }
   .pv-wide { font-size: 12.5px; }
   .pv-body { padding: 8px; }
 }
+
+/* ===== スマホ表示の調整（390px 前後） =====
+   - 日本語の見出しや短い文が「す。」「う」だけで次の行に落ちないよう、
+     対応ブラウザでは文節で改行します（word-break: auto-phrase）。 */
+h1, h2, h3, h4,
+.hero-sub, .target-banner .t-main, .target-banner .t-note,
+.place-card .name, .proposals li, .principles .p-title,
+.yt-banner p, .lead p, footer, .bn-lead, .bn-note {
+  word-break: auto-phrase;
+}
+@media (max-width: 520px) {
+  .site-header .sub { font-size: 10.5px; letter-spacing: 0.14em; }
+  .hero-image { padding: 56px 16px; }
+  .hero-image .eyebrow { font-size: 11.5px; letter-spacing: 0.24em; }
+  .hero-image h2 { font-size: 24px; letter-spacing: 0.05em; line-height: 1.6; }
+  .hero-image .hero-sub { font-size: 14.5px; }
+  .target-banner { padding: 16px 16px; }
+  .target-banner .t-note { font-size: 13px; padding: 4px 12px; }
+  .info-table th { width: auto; padding: 14px 12px; white-space: nowrap; }
+  .info-table td { padding: 14px 14px; }
+  .proposals li { padding: 13px 14px 13px 54px; }
+  .box { padding: 22px 20px; }
+  .place-card { padding: 26px 18px; }
+  .place-card .name { font-size: 18px; }
+  .article h3.sub-head { font-size: 19px; }
+  .bn-years a { padding: 6px 14px; }
+}
