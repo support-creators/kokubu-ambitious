@@ -125,7 +125,7 @@ img { max-width: 100%; }
   text-align: center;
   background-image:
     linear-gradient(rgba(61,56,51,0.42), rgba(61,56,51,0.42)),
-    url('images/hero.jpg'),
+    url('hero.jpg'),
     linear-gradient(135deg, #f0a04b 0%, #e67e22 45%, #7a9e5f 100%);
   background-size: cover, cover, cover;
   background-position: center;
