@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>配置表（サイトマップ）｜国分アンビシャス広場</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<!-- このページは管理用の「配置表」です。トップページやメニューからはリンクしていません。
+     ページを増やしたり、並びを変えたりしたら、この表も直してください。 -->
+<style>
+  .sm-lead { max-width: 760px; margin: 0 auto 28px; font-size: 15px; }
+  .sm-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; font-size: 13px; margin: 0 0 28px; }
+  .sm-badge { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 10px; white-space: nowrap; line-height: 1.6; }
+  .b-nav { background: rgba(230,126,34,0.14); color: var(--orange-deep); }
+  .b-pub { background: rgba(122,158,95,0.18); color: var(--green-deep); }
+  .b-teach { background: #3d3833; color: #fff; }
+  .b-sys { background: rgba(61,56,51,0.1); color: var(--ink); }
+  .sm-group { font-size: 20px; font-weight: 900; margin: 44px 0 6px; padding-left: 14px; border-left: 6px solid var(--orange); border-radius: 3px; }
+  .sm-group.teach { border-left-color: var(--ink); }
+  .sm-group.sys { border-left-color: var(--gray); }
+  .sm-gnote { font-size: 13.5px; color: var(--gray); margin: 0 0 14px; }
+  .sm-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--white); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(61,56,51,0.06); font-size: 14.5px; }
+  .sm-table th, .sm-table td { padding: 14px 14px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+  .sm-table thead th { background: rgba(230,126,34,0.10); color: var(--orange-deep); font-family: 'Zen Maru Gothic', sans-serif; font-weight: 900; font-size: 14px; white-space: nowrap; }
+  .sm-table tbody tr:last-child td { border-bottom: none; }
+  .sm-table .c-name { width: 17%; }
+  .sm-table .c-url { width: 19%; }
+  .sm-table .c-what { width: 24%; }
+  .sm-name { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 900; font-size: 16px; display: block; margin-bottom: 4px; }
+  .sm-url { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; word-break: break-all; }
+  a.sm-url { color: var(--orange-deep); font-weight: 700; display: inline-block; padding: 8px 0; }
+  .sm-parts { margin: 0; padding-left: 1.5em; }
+  .sm-parts li { margin: 2px 0; }
+  .sm-parts .sub { display: block; font-size: 13px; color: var(--gray); }
+  .sm-btn { display: inline-block; font-size: 12.5px; font-weight: 700; border: 1px solid var(--line); background: var(--base); border-radius: 8px; padding: 0 7px; margin: 1px 2px; white-space: nowrap; }
+  .sm-files { margin: 6px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12.5px; }
+  .sm-foot { font-size: 13.5px; color: var(--gray); margin-top: 26px; }
+
+  /* スマホ：表の1行を1枚のカードにして縦に並べる */
+  @media (max-width: 720px) {
+    .sm-table, .sm-table tbody, .sm-table tr, .sm-table td { display: block; width: 100% !important; }
+    .sm-table thead { display: none; }
+    .sm-table { background: transparent; border: 0; box-shadow: none; border-radius: 0; overflow: visible; }
+    .sm-table tr { background: var(--white); border: 1px solid var(--line); border-radius: 16px; margin-bottom: 14px; box-shadow: 0 4px 14px rgba(61,56,51,0.06); overflow: hidden; }
+    .sm-table td { border-bottom: 1px dashed var(--line); padding: 10px 16px; }
+    .sm-table td:last-child { border-bottom: 0; }
+    .sm-table td[data-label]::before { content: attr(data-label); display: block; font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--orange-deep); margin-bottom: 2px; }
+    .sm-table td.c-name::before { display: none; }
+    .sm-table td.c-name { background: rgba(230,126,34,0.07); }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="mark">国分</div>
+  <h1><a href="index.html">国分アンビシャス広場</a></h1>
+  <div class="sub">KOKUBU AMBITIOUS OPEN SPACE ｜ SINCE 2001</div>
+</header>
+
+<div class="page-title-band">
+  <div class="eyebrow">SITE MAP</div>
+  <h2>配置表（サイトマップ）</h2>
+</div>
+
+<section class="section">
+  <div class="wrap">
+    <p class="sm-lead">ホームページの全ページについて、<strong>ページ名・URL・何のページか・上から順に並んでいる主な部分</strong>（見出し・セクション・ボタン）をまとめた管理用の表です。<br>このページは検索に出ないようにしてあり、トップページなどからはリンクしていません。</p>
+
+    <div class="sm-legend">
+      <span><span class="sm-badge b-nav">メニューあり</span> 上のメニューから行ける</span>
+      <span><span class="sm-badge b-pub">公開</span> 公開しているがメニューには無い</span>
+      <span><span class="sm-badge b-teach">先生用</span> 先生だけが使う（リンクなし・検索に出ない）</span>
+      <span><span class="sm-badge b-sys">しくみ</span> 画面として見せないファイル</span>
+    </div>
+
+    <!-- ===================== 1. メニューから行けるページ ===================== -->
+    <h3 class="sm-group">1. メニューから行けるページ</h3>
+    <p class="sm-gnote">どのページにも、上に「ヘッダー（国分マーク・サイト名・スローガン）」と「メニュー（ホーム／ご案内／アンビシャス運動／バックナンバー／▶ YouTube）」、下に「フッター（対象のご注意・これまでの訪問者数）」があります。下の表では、そのあいだの部分を書いています。</p>
+    <table class="sm-table">
+      <thead><tr><th class="c-name">ページ名</th><th class="c-url">URL</th><th class="c-what">何のページか</th><th>主な部分（上から順）</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="c-name"><span class="sm-name">ホーム</span><span class="sm-badge b-nav">メニューあり</span></td>
+          <td class="c-url" data-label="URL"><a class="sm-url" href="index.html">index.html</a><br><span class="sm-url">（https://support-creators.github.io/kokubu-ambitious/）</span></td>
+          <td class="c-what" data-label="何のページか">サイトの入口。広場の紹介、広場だより最新号、動画、場所をのせています。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>ヘッダー・メニュー</li>
+            <li>トップ写真のスライドショー（こま遊びの写真6枚）<span class="sub">見出し「子ども達が楽しく遊び、いろんな体験をしています。」と説明文</span></li>
+            <li>対象のご案内（太宰府市国分小校区の小学生・未就学児／未就学児は保護者同伴）</li>
+            <li>NEWS「広場だより　最新号」（2026年10月号 NO.185 の紙面画像）<span class="sub">「バックナンバー一覧」へのリンク</span></li>
+            <li>「活動のようすを動画で」<span class="sm-btn">▶ YouTubeチャンネルを見る</span></li>
+            <li>PLACE「場所」（国分4丁目・文化ふれあい館前の広場）<span class="sm-btn">📍 Googleマップで開く</span></li>
+            <li>フッター</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="c-name"><span class="sm-name">ご案内</span><span class="sm-badge b-nav">メニューあり</span></td>
+          <td class="c-url" data-label="URL"><a class="sm-url" href="goannai.html">goannai.html</a></td>
+          <td class="c-what" data-label="何のページか">広場の目的、開催日時・場所・参加費、沿革、ボランティア募集のご案内。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>ヘッダー・メニュー</li>
+            <li>GUIDE「ご案内」（ページの題名）</li>
+            <li>対象のご案内</li>
+            <li>アンビシャス広場とは（目的5つの番号リスト）</li>
+            <li>開催日時（表：対象／囲碁教室／広場／場所／参加費）<span class="sm-btn">📍 Googleマップで開く</span></li>
+            <li>沿革</li>
+            <li>ボランティア募集 — 応援をお願いします！</li>
+            <li><span class="sm-btn">← ホームに戻る</span></li>
+            <li>フッター</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="c-name"><span class="sm-name">アンビシャス運動</span><span class="sm-badge b-nav">メニューあり</span></td>
+          <td class="c-url" data-label="URL"><a class="sm-url" href="undou.html">undou.html</a></td>
+          <td class="c-what" data-label="何のページか">福岡県の「青少年アンビシャス運動」の考え方を紹介するページ。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>ヘッダー・メニュー</li>
+            <li>写真つきの題名「アンビシャス運動とは」</li>
+            <li>対象のご案内・はじめの説明文</li>
+            <li>THREE PILLARS「三つの柱」（豊かな心／幅広い視野／それぞれの志を持つ）</li>
+            <li>PRINCIPLES「運動の三原則」</li>
+            <li>BACKGROUND「運動を開始した背景」</li>
+            <li>12 PROPOSALS「子どもがアンビシャスになるための12の提案」</li>
+            <li>COLUMN「コラム：なぜ『アンビシャス』」</li>
+            <li><span class="sm-btn">← ホームに戻る</span></li>
+            <li>フッター</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="c-name"><span class="sm-name">広場だより バックナンバー</span><span class="sm-badge b-nav">メニューあり</span></td>
+          <td class="c-url" data-label="URL"><a class="sm-url" href="archive.html">archive.html</a></td>
+          <td class="c-what" data-label="何のページか">これまでの「広場だより」を表紙から選んで読めるページ（2001年7月の開設案内〜最新号）。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>ヘッダー・メニュー</li>
+            <li>ARCHIVE「広場だより　バックナンバー」（ページの題名）と説明文</li>
+            <li>最近の号の表紙一覧（NO.185〜NO.176）</li>
+            <li>PDF「過去の号」（開設案内〜NO.175）<span class="sub">年で移動するボタン（2024〜2001）→ 年ごとの表紙一覧。2001〜2004年は「HTML版」の印つき</span></li>
+            <li><span class="sm-btn">← ホームに戻る</span></li>
+            <li>フッター</li>
+            <li>表紙を押すと開くPDFビューア<span class="sm-btn">‹</span><span class="sm-btn">›</span><span class="sm-btn">－</span><span class="sm-btn">＋</span><span class="sm-btn">×</span></li>
+          </ol></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ===================== 2. 公開しているがメニューに無いページ ===================== -->
+    <h3 class="sm-group">2. 公開しているが、メニューには無いページ</h3>
+    <p class="sm-gnote">URLを知っている人やQRコード・LINEなどから開くページです。</p>
+    <table class="sm-table">
+      <thead><tr><th class="c-name">ページ名</th><th class="c-url">URL</th><th class="c-what">何のページか</th><th>主な部分（上から順）</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="c-name"><span class="sm-name">第1回 国分アンビシャス杯 和ごま大会</span><span class="sm-badge b-pub">公開</span></td>
+          <td class="c-url" data-label="URL"><a class="sm-url" href="wagoma2026/index.html">wagoma2026/index.html</a></td>
+          <td class="c-what" data-label="何のページか">広場25周年記念の和ごま大会（2026年12月19日（土）午後）のお知らせ。ほかのページとは別のデザインです。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>ページ内メニュー（開催情報／大会概要／競技ルール／当日の流れ／申込み／大会結果／会場）※横にスクロール</li>
+            <li>大会の題名・日付・場所・「大会まで あと○日」</li>
+            <li>開催情報（開催予定・延期のお知らせ）</li>
+            <li>ごあいさつ</li>
+            <li>大会概要（日時・会場・雨天時・部門・競技方法・使用こま・主催）</li>
+            <li>競技ルール（団体戦 → 最終戦 オールスター戦、持ち物）</li>
+            <li>当日の流れ（時刻ごとの予定）</li>
+            <li>参加申込み（LINEの投票で）</li>
+            <li>大会結果（大会後に掲載）</li>
+            <li>会場（地図）<span class="sm-btn">Googleマップで開く ›</span></li>
+            <li>フッター<span class="sm-btn">← アンビシャス広場トップへ</span></li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="c-name"><span class="sm-name">囲碁アプリ（正式版）</span><span class="sm-badge b-pub">公開</span></td>
+          <td class="c-url" data-label="URL"><a class="sm-url" href="igo/index.html">igo/index.html</a></td>
+          <td class="c-what" data-label="何のページか">囲碁教室の子どもが使う練習アプリ。級ごとのテストや練習ができ、進み具合を記録シートへ送ります。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>上の帯（アプリ名・版／なまえボタン）</li>
+            <li>名前えらび画面「だれが やる？」<span class="sm-btn">＋ なまえを ついか</span><span class="sub">ニックネームで入れる注意</span></li>
+            <li>メニュー画面（いまの級・テーマ）<span class="sm-btn">ぼうけんに でかける</span><span class="sm-btn">きょうの 5もん</span><span class="sm-btn">しょうきゅう テスト</span><span class="sm-btn">れんぞく チャレンジ</span><span class="sm-btn">ふくしゅう</span><span class="sm-btn">コンピュータと うつ</span><span class="sm-btn">じゆうに うつ</span><span class="sm-btn">まめちしき</span><span class="sm-btn">バッジ</span></li>
+            <li>もんだい画面（碁盤）<span class="sm-btn">ヒント</span><span class="sm-btn">やりなおし</span><span class="sm-btn">こたえを みる</span><span class="sm-btn">つぎへ</span><span class="sm-btn">やめる</span></li>
+            <li>けっか・にんていしょう（しょうきゅうテストに合格したとき）</li>
+            <li>コンピュータと うつ（つよさえらび → 対局）<span class="sm-btn">まった</span><span class="sm-btn">パス</span><span class="sm-btn">かぞえる</span></li>
+            <li>じゆうに うつ（9・13・19ろ）</li>
+            <li>いちばん下「つかいかた・バージョン」（ひらくと説明）</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="c-name"><span class="sm-name">囲碁アプリ（ためしプレイ版）</span><span class="sm-badge b-pub">公開</span></td>
+          <td class="c-url" data-label="URL"><a class="sm-url" href="igo/tameshi.html">igo/tameshi.html</a></td>
+          <td class="c-what" data-label="何のページか">正式版と同じ中身で、記録シートへ記録を送らない試し用。</td>
+          <td data-label="主な部分（上から順）">正式版（igo/index.html）と同じです。題名の下に「ためしプレイ版」と出ます。</td>
+        </tr>
+        <tr>
+          <td class="c-name"><span class="sm-name">広場だより HTML版（2001〜2004年）</span><span class="sm-badge b-pub">公開</span></td>
+          <td class="c-url" data-label="URL"><span class="sm-url">tayori/html/2001-2004/ の中の20ページ</span>
+            <ul class="sm-files">
+              <li><a class="sm-url" href="tayori/html/2001-2004/kokubu_000_2001-07.html">kokubu_000_2001-07.html</a></li>
+              <li class="sm-url">kokubu_001_2001-09 〜</li>
+              <li class="sm-url">kokubu_014_2002-10</li>
+              <li class="sm-url">kokubu_022_2003-06</li>
+              <li class="sm-url">kokubu_028_2003-12</li>
+              <li class="sm-url">kokubu_030_2004-02</li>
+              <li class="sm-url">kokubu_034_2004-06</li>
+            </ul></td>
+          <td class="c-what" data-label="何のページか">古い広場だよりの紙面を、文字で作り直したもの。バックナンバーの「HTML版」の印から開きます。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>上のバー<span class="sm-btn">← バックナンバーに戻る</span>（号の名前）<span class="sm-btn">印刷</span></li>
+            <li>紙面（画面の幅に合わせて縮めて表示）</li>
+          </ol></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ===================== 3. 先生用ページ ===================== -->
+    <h3 class="sm-group teach">3. 先生用ページ（囲碁アプリ）</h3>
+    <p class="sm-gnote">先生だけが使うページです。トップページ・メニュー・子どもの画面からはリンクしていません。検索にも出ないようにしてあります（noindex）。アドレスは先生どうしだけで共有してください。</p>
+    <table class="sm-table">
+      <thead><tr><th class="c-name">ページ名</th><th class="c-url">URL</th><th class="c-what">何のページか</th><th>主な部分（上から順）</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="c-name"><span class="sm-name">先生用ページ</span><span class="sm-badge b-teach">先生用</span></td>
+          <td class="c-url" data-label="URL"><span class="sm-url">igo/sensei.html</span></td>
+          <td class="c-what" data-label="何のページか">囲碁アプリの先生用画面への入口。ここから開いたタブだけが「先生モード」になります。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>題名「先生用ページ」と説明</li>
+            <li>アプリの先生用画面（本番）<span class="sm-btn">先生用レビュー</span><span class="sm-btn">みんなの れんしゅう 記録（この端末）</span></li>
+            <li>そのほかの先生用ページ<span class="sm-btn">記録シートを見る</span><span class="sm-btn">問題づくり</span></li>
+            <li>ためしプレイ版<span class="sm-btn">ためしプレイ版で 先生用レビュー</span><span class="sm-btn">ためしプレイ版で れんしゅう 記録</span></li>
+            <li><span class="sm-btn">子どもの画面へ戻る</span></li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="c-name"><span class="sm-name">進み具合（記録シート）</span><span class="sm-badge b-teach">先生用</span></td>
+          <td class="c-url" data-label="URL"><span class="sm-url">igo/kiroku.html</span></td>
+          <td class="c-what" data-label="何のページか">アプリから記録シートに届いた、子どもごとの級や昇級を見るページ。合言葉が必要です。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>題名「進み具合」<span class="sm-btn">更新</span></li>
+            <li>「合言葉を入れてください」<span class="sm-btn">見る</span></li>
+            <li>（合言葉のあと）子どもごとの級</li>
+            <li>（合言葉のあと）最近の昇級</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="c-name"><span class="sm-name">問題をつくる</span><span class="sm-badge b-teach">先生用</span></td>
+          <td class="c-url" data-label="URL"><span class="sm-url">igo/make.html</span></td>
+          <td class="c-what" data-label="何のページか">アプリに追加する問題を碁盤の上で作り、JSONファイルにするページ。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>題名「問題をつくる」</li>
+            <li>碁盤と案内のメッセージ</li>
+            <li>作り方の切りかえ<span class="sm-btn">1. 石をおく</span><span class="sm-btn">2. 正解をいれる</span><span class="sm-btn">3. ためす</span>（おく石：黒／白／けす）</li>
+            <li>問題の設定（盤の大きさ・手番・級・タイトル・ヒント）<span class="sm-btn">この問題をリストに入れる</span><span class="sm-btn">あたらしい問題</span></li>
+            <li>作った問題<span class="sm-btn">problems-extra.json を保存</span><span class="sm-btn">JSONをコピー</span></li>
+            <li>よみこむ<span class="sm-btn">よみこむ</span></li>
+            <li>写真から作る<span class="sm-btn">指示文をコピー</span></li>
+          </ol></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ===================== 4. しくみのファイル ===================== -->
+    <h3 class="sm-group sys">4. 画面として見せないファイル</h3>
+    <table class="sm-table">
+      <thead><tr><th class="c-name">ページ名</th><th class="c-url">URL</th><th class="c-what">何のページか</th><th>主な部分（上から順）</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="c-name"><span class="sm-name">Google 確認用ファイル</span><span class="sm-badge b-sys">しくみ</span></td>
+          <td class="c-url" data-label="URL"><span class="sm-url">google7f04af848853f993.html</span></td>
+          <td class="c-what" data-label="何のページか">Google（サーチコンソール）にこのサイトの持ち主だと知らせるためのファイル。消さないでください。</td>
+          <td data-label="主な部分（上から順）">1行の文字だけです。</td>
+        </tr>
+        <tr>
+          <td class="c-name"><span class="sm-name">配置表（このページ）</span><span class="sm-badge b-sys">しくみ</span></td>
+          <td class="c-url" data-label="URL"><span class="sm-url">sitemap.html</span></td>
+          <td class="c-what" data-label="何のページか">サイト全体のページと中身の並びをまとめた管理用の表。検索に出ない設定（noindex）で、どこからもリンクしていません。</td>
+          <td data-label="主な部分（上から順）"><ol class="sm-parts">
+            <li>ヘッダー（サイト名）・題名「配置表（サイトマップ）」</li>
+            <li>説明と印の見かた</li>
+            <li>表「メニューから行けるページ」</li>
+            <li>表「公開しているが、メニューには無いページ」</li>
+            <li>表「先生用ページ」</li>
+            <li>表「画面として見せないファイル」</li>
+          </ol></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="sm-foot">※ 2026年11月時点の内容です。ページを追加・変更したときは、この表も更新してください。</p>
+    <div class="center"><a class="backlink" href="index.html">← ホームに戻る</a></div>
+  </div>
+</section>
+
+<footer>
+  © 国分アンビシャス広場
+</footer>
+
+</body>
+</html>
