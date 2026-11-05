@@ -156,6 +156,43 @@ img { max-width: 100%; }
 }
 .hero-image.tall { min-height: 400px; }
 
+/* ヒーロー：写真スライドショー（ホーム） */
+.hero-image.has-slides {
+  overflow: hidden;
+  background-image: linear-gradient(135deg, #f0a04b 0%, #e67e22 45%, #7a9e5f 100%);
+}
+.hero-slides {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.hero-slides img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+.hero-slides img.is-prev { opacity: 1; z-index: 1; transition: none; }
+.hero-slides img.is-active { opacity: 1; z-index: 2; }
+/* 文字を読みやすくするための薄いオーバーレイ */
+.hero-slides::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    radial-gradient(ellipse at center, rgba(40,36,32,0.28) 0%, rgba(40,36,32,0) 70%),
+    linear-gradient(rgba(61,56,51,0.40), rgba(61,56,51,0.40));
+}
+.hero-image .hero-content { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-slides img { transition: none; }
+}
+
 /* ページタイトル帯（写真なしページ用） */
 .page-title-band {
   background: linear-gradient(135deg, rgba(230,126,34,0.14), rgba(122,158,95,0.14));
