@@ -244,6 +244,11 @@ footer {
   h1 { font-size: 30px; }
   .books { grid-template-columns: 1fr 1fr; }
 }
+@media (max-width: 899px) {
+  .app { padding-left: 4px; padding-right: 4px; }
+  .board-card { padding: 4px; }
+  .board-scroll { max-height: none; }
+}
 @media (min-width: 900px) {
   .play { display: grid; grid-template-columns: minmax(0, 1fr) 340px; align-items: start; }
   .panel { position: sticky; top: 84px; }

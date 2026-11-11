@@ -25,6 +25,7 @@
   let bookId = null;
   let play = null;
   let preferFit = false;
+  let preferLarge = false;
   let downPt = null;
   const timers = new Set();
   const ui = {};
@@ -80,6 +81,10 @@
     else showHome();
   }
   back.addEventListener('click', goBack);
+  window.addEventListener('resize', () => {
+    if (!play || !ui.svg) return;
+    applyBoardWidth();
+  });
 
   function showHome() {
     clearTimers();
@@ -231,7 +236,8 @@
       else showList(play.problem.book);
     });
     zoom.addEventListener('click', () => {
-      preferFit = !preferFit;
+      if (narrowScreen()) preferLarge = !preferLarge;
+      else preferFit = !preferFit;
       applyBoardWidth();
       requestAnimationFrame(centerScroll);
     });
@@ -313,19 +319,35 @@
     ui.explain.textContent = text || '';
   }
 
+  function narrowScreen() {
+    return window.matchMedia('(max-width: 899px)').matches;
+  }
+  // スマホは、はじめに盤ぜんたいを画面の幅へ合わせる。1マスが28pxより小さくなるときだけ大きくする。
   function minCss(view) {
     const cols = view.x1 - view.x0 + 1;
-    return 48 * (cols + 0.6);
+    if (!narrowScreen()) return 48 * (cols + 0.6);
+    const g = geomOf(play.board, view);
+    return 28 * g.Wd / g.cell;
   }
   function applyBoardWidth() {
     if (!play || !ui.svg) return;
+    const phone = narrowScreen();
     const need = minCss(play.view);
     const avail = ui.scroll.clientWidth || 0;
     const tight = avail > 0 && need > avail + 2;
-    ui.svg.style.minWidth = (preferFit && tight) ? '0px' : need + 'px';
+    const fit = phone ? !preferLarge : preferFit;
+    const wide = !fit && tight;
+    ui.svg.style.minWidth = (fit && tight) ? '0px' : need + 'px';
     ui.svg.style.width = '100%';
     ui.zoom.hidden = !tight;
-    ui.zoom.textContent = preferFit ? 'おおきく みる' : 'ぜんたいを みる';
+    ui.zoom.textContent = fit ? 'おおきく みる' : 'ぜんたいを みる';
+    if (phone) {
+      ui.scroll.style.overflowX = wide ? 'auto' : 'visible';
+      ui.scroll.style.overflowY = 'visible';
+    } else {
+      ui.scroll.style.overflowX = '';
+      ui.scroll.style.overflowY = '';
+    }
   }
   function centerScroll() {
     if (!play || !ui.scroll) return;
