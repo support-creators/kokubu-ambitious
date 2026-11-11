@@ -81,14 +81,18 @@
     else showHome();
   }
   back.addEventListener('click', goBack);
-  window.addEventListener('resize', () => {
+  // 変更：スマホの回転やアドレスバーの出入りでも、盤の大きさを合わせ直す。
+  function onViewportResize() {
     if (!play || !ui.svg) return;
     applyBoardWidth();
-  });
+  }
+  window.addEventListener('resize', onViewportResize);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', onViewportResize);
 
   function showHome() {
     clearTimers();
     screen = 'home';
+    main.classList.remove('playing'); // 変更：固定ボタン帯は問題画面だけに出す。
     play = null;
     bookId = null;
     back.hidden = true;
@@ -141,6 +145,7 @@
   function showList(id) {
     clearTimers();
     screen = 'list';
+    main.classList.remove('playing'); // 変更
     play = null;
     bookId = id;
     const book = bookById(id);
@@ -185,6 +190,7 @@
   function showPlay(list, index) {
     clearTimers();
     screen = 'play';
+    main.classList.add('playing'); // 変更：スマホのボタン帯ぶんの余白を確保する。
     bookId = list[index].book;
     back.hidden = false;
     main.replaceChildren();
@@ -220,7 +226,7 @@
     panel.append(big, nonum, same, ptitle, sub, turn, chip, zoom, msg, explain, actions);
     const wrap = el('div', { class: 'play' }, [card, panel]);
     main.appendChild(wrap);
-    Object.assign(ui, { scroll, svg, big, nonum, same, ptitle, sub, stone, turnText, chip, msg, explain, zoom, hint, retry, answer, prev, next });
+    Object.assign(ui, { scroll, svg, big, nonum, same, ptitle, sub, turn, stone, turnText, chip, msg, explain, zoom, actions, hint, retry, answer, prev, next }); // 変更：高さの計測用。
     hint.addEventListener('click', () => {
       if (!play || play.state !== 'play') return;
       play.hint = true;
@@ -262,6 +268,7 @@
 
   function load(index) {
     clearTimers();
+    if (narrowScreen()) preferLarge = false; // 変更：つぎの問題は必ず盤全体から見せる。
     const problem = play.list[index];
     const board = new GoEngine.Board(problem.size);
     (problem.B || []).forEach(s => { board.grid[toIdx(board, s)] = GoEngine.BLACK; });
@@ -331,23 +338,49 @@
   }
   function applyBoardWidth() {
     if (!play || !ui.svg) return;
-    const phone = narrowScreen();
+    // 変更：スマホは画面の「残りの高さ」も使って盤を縮める。
+    // SVGの実際の幅と縦横比をそろえるので、pointAt の座標計算は変えない。
+    if (narrowScreen()) {
+      const g = geomOf(play.board, play.view);
+      const avail = ui.scroll.clientWidth;
+      if (!avail) return;
+      const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      const boardTop = ui.scroll.getBoundingClientRect().top + window.scrollY;
+      const actionHeight = ui.actions.getBoundingClientRect().height;
+      const turnHeight = ui.turn.getBoundingClientRect().height;
+      const msgHeight = ui.msg.getBoundingClientRect().height;
+      // 変更：横向きでは手番とメッセージを盤の右へ置き、盤の高さを確保する。
+      const landscape = window.matchMedia('(orientation: landscape) and (max-height: 550px)').matches;
+      const otherHeight = landscape ? 12 : turnHeight + msgHeight + 38;
+      const room = Math.max(120, Math.floor(viewportHeight - boardTop - actionHeight - otherHeight));
+      const fitWidth = Math.max(1, Math.floor(Math.min(avail, room * g.Wd / g.Ht)));
+      const need = minCss(play.view);
+      const tight = need > fitWidth + 2;
+      const wide = preferLarge && tight;
+      const width = wide ? Math.ceil(need) : fitWidth;
+      ui.svg.style.minWidth = '0';
+      ui.svg.style.width = width + 'px';
+      ui.svg.style.height = 'auto';
+      ui.scroll.style.maxHeight = room + 'px';
+      ui.scroll.style.overflowX = wide ? 'auto' : 'hidden';
+      ui.scroll.style.overflowY = wide ? 'auto' : 'hidden';
+      ui.zoom.hidden = !tight;
+      ui.zoom.textContent = wide ? 'ぜんたいを みる' : 'おおきく みる';
+      return;
+    }
+    // パソコンの表示と操作は変更しない。
     const need = minCss(play.view);
     const avail = ui.scroll.clientWidth || 0;
     const tight = avail > 0 && need > avail + 2;
-    const fit = phone ? !preferLarge : preferFit;
-    const wide = !fit && tight;
+    const fit = preferFit;
     ui.svg.style.minWidth = (fit && tight) ? '0px' : need + 'px';
     ui.svg.style.width = '100%';
+    ui.svg.style.height = '';
+    ui.scroll.style.maxHeight = '';
     ui.zoom.hidden = !tight;
     ui.zoom.textContent = fit ? 'おおきく みる' : 'ぜんたいを みる';
-    if (phone) {
-      ui.scroll.style.overflowX = wide ? 'auto' : 'visible';
-      ui.scroll.style.overflowY = 'visible';
-    } else {
-      ui.scroll.style.overflowX = '';
-      ui.scroll.style.overflowY = '';
-    }
+    ui.scroll.style.overflowX = '';
+    ui.scroll.style.overflowY = '';
   }
   function centerScroll() {
     if (!play || !ui.scroll) return;
@@ -679,6 +712,7 @@
   }
   function showGate() {
     screen = 'gate';
+    main.classList.remove('playing'); // 変更
     play = null;
     bookId = null;
     back.hidden = true;
