@@ -57,6 +57,8 @@ python3 -m http.server 47321
 
 このページは、公開リポジトリ `kokubu-ambitious` の `igoren/` フォルダとして、GitHub Pages で出しています。アドレスは https://support-creators.github.io/kokubu-ambitious/igoren/ です。検索避けに `noindex,nofollow` を付けていますが、アドレスを知っていればページ自体は開きます。問題データは、あいことばがないと読めません。
 
+訪問回数だけを GoatCounter で数えています。名前、進み具合、あいことばなどの個人情報は送りません。
+
 以前のコミット `ceb826c` には、平文の `problems.js` が残っていました。そのため、非公開の元のリポジトリは公開せず、いまのファイルだけを新しい履歴として、ここに置いています。
 
 ## 利用許可
