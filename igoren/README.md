@@ -53,21 +53,15 @@ IGOREN_PASSWORD='あいことば' node tools/build-encrypted.mjs igoren-problems
 python3 -m http.server 47321
 ```
 
-## GitHub Pages で出すとき
+## 公開のしかた
 
-ファイルはリポジトリの直下に置いてあります。`problems.enc.json` を置いてから公開します。
+このページは、公開リポジトリ `kokubu-ambitious` の `igoren/` フォルダとして、GitHub Pages で出しています。アドレスは https://support-creators.github.io/kokubu-ambitious/igoren/ です。検索避けに `noindex,nofollow` を付けていますが、アドレスを知っていればページ自体は開きます。問題データは、あいことばがないと読めません。
 
-1. GitHub のリポジトリで Settings → Pages を開く
-2. Build and deployment の Branch を `main`、フォルダを `/ (root)` にする
-3. 保存する
-
-しばらくすると `https://<ユーザー名>.github.io/<リポジトリ名>/` で開きます。検索避けに `noindex,nofollow` と `robots.txt` を付けていますが、アドレスを知っていればページ自体は開きます。
-
-以前のコミット `ceb826c` には、平文の `problems.js` が残っています。ファイルを後から消しても、その履歴には問題が残ります。公開する前に、履歴ごと新しいリポジトリを作り直してください。
+以前のコミット `ceb826c` には、平文の `problems.js` が残っていました。そのため、非公開の元のリポジトリは公開せず、いまのファイルだけを新しい履歴として、ここに置いています。
 
 ## 利用許可
 
-イゴロクの問題をここに載せてよいかは、まだ権利者に確認できていません。確認が取れるまで、このページをインターネットに公開しないでください。教室の内部テスト用です。許可を得たとは書いていません。あいことばを付けても、利用許可の代わりにはなりません。
+イゴロクの作者本人が、この教室でイゴロクの問題を使ってよいと確認しました（2026年11月11日）。あいことばは、教室の関係者にだけ伝えてください。
 
 ## ファイル
 
@@ -75,7 +69,7 @@ python3 -m http.server 47321
 - `style.css` … 見た目
 - `app.js` … あいことば、画面、答え合わせ
 - `engine.js` … 盤のルールと描画
-- `problems.enc.json` … 暗号化した 971 問（作ったあとで置く）
+- `problems.enc.json` … 暗号化した 971 問
 - `tools/build-encrypted.mjs` … 平文 JSON を暗号化するための道具
 - `robots.txt` … クローラを拒む
 - `test/check.mjs` … 問数、着手の合法性、あいことばの確認
