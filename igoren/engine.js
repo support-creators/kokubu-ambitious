@@ -155,7 +155,7 @@ function drawBoard(svg, board, opt = {}) {
   for (let y = v.y0; y <= v.y1; y++) el('line', { x1: lx0, y1: py(y), x2: lx1, y2: py(y), stroke: '#5a4020', 'stroke-width': (y === 0 || y === n - 1) ? sw * 2 : sw });
   for (let x = v.x0; x <= v.x1; x++) el('line', { x1: px(x), y1: ly0, x2: px(x), y2: ly1, stroke: '#5a4020', 'stroke-width': (x === 0 || x === n - 1) ? sw * 2 : sw });
   starPoints(n).forEach(([x, y]) => { if (x >= v.x0 && x <= v.x1 && y >= v.y0 && y <= v.y1) el('circle', { cx: px(x), cy: py(y), r: cell * .09, fill: '#5a4020' }); });
-  const r = cell * .47, atari = opt.atari ? board.atariStones() : new Set(), labels = opt.labels || {};
+  const r = cell * .47, atari = opt.ring ? opt.ring : opt.atari ? board.atariStones() : new Set(), labels = opt.labels || {};
   for (let i = 0; i < n * n; i++) {
     const c = board.get(i), [x, y] = board.xy(i);
     if (x < v.x0 || x > v.x1 || y < v.y0 || y > v.y1) continue;

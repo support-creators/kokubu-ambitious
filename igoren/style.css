@@ -205,6 +205,8 @@ svg.board {
   padding: 10px 12px;
   font-weight: 800;
   background: var(--card);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
   border: 1px solid var(--line);
 }
 .msg.warn { background: #fde8e4; color: var(--warn); border-color: #f3c2ba; }

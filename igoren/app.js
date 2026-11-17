@@ -230,7 +230,9 @@
     hint.addEventListener('click', () => {
       if (!play || play.state !== 'play') return;
       play.hint = true;
-      setMsg(play.problem.hint || 'よく みてみよう', 'hint');
+      const h = makeHint(play.problem);
+      play.ring = h.ring;
+      setMsg(h.text, 'hint');
       paint();
     });
     retry.addEventListener('click', onRetry);
@@ -291,7 +293,7 @@
       labels, baseLabels: { ...labels }, later: laterMap,
       start: board.snapshot(),
       state: 'play', missed: false, shown: false, hint: false,
-      mark: null, circle: null, hover: null,
+      mark: null, circle: null, hover: null, ring: null,
       token: (play.token || 0) + 1,
       msg: 'どこに うつかな？', kind: ''
     });
@@ -406,7 +408,7 @@
     if (!play) return;
     applyBoardWidth();
     drawBoard(ui.svg, play.board, {
-      atari: !!play.hint,
+      ring: play.hint && play.ring ? play.ring : new Set(),
       mark: play.mark,
       circle: play.circle,
       view: play.view,
@@ -536,6 +538,74 @@
       paint();
     }, reduceMotion ? 0 : 560);
   }
+
+  // ヒント：問題の分類ではなく、こたえの手順を盤で うごかして きめる。
+  // 取る・アタリにする・たすける・つなぐ・せめる のどれかを見て、ねらう石だけに あかい わを つける。
+  // A・B から えらぶ問題は、わを つけると こたえが わかるので ことばだけ。
+  function makeHint(problem) {
+    const G = GoEngine;
+    const h = hintFor(problem);
+    if (h) return h;
+    if (problem.choice) {
+      const ls = Object.values(problem.labels || {}).filter(t => /^[A-Z]$/.test(t)).sort();
+      return { ring: null, text: ls.join('・') + ' に うったら どう なるか、ひとつずつ かんがえよう' };
+    }
+    return { ring: null, text: 'よく みてみよう' };
+  }
+  function hintFor(problem) {
+    const G = GoEngine;
+
+  const b=new G.Board(problem.size);
+  (problem.B||[]).forEach(s=>{b.grid[toIdx(b,s)]=G.BLACK});
+  (problem.W||[]).forEach(s=>{b.grid[toIdx(b,s)]=G.WHITE});
+  const me=problem.toPlay==='W'?G.WHITE:G.BLACK, op=G.other(me);
+  b.turn=me;
+  if (problem.choice) return null;
+  const path=answerPath(problem.tree)||[];
+  if(!path.length) return null;
+  const myName=me===G.BLACK?'くろ':'しろ', opName=op===G.BLACK?'くろ':'しろ';
+  const start=b.snapshot();
+  const groupsOf=(bd,color)=>{const seen=new Set(),gs=[];for(let i=0;i<bd.grid.length;i++){if(bd.grid[i]!==color||seen.has(i))continue;const g=bd.group(i);g.stones.forEach(s=>seen.add(s));gs.push(g);}return gs;};
+  const op0=groupsOf(b,op), my0=groupsOf(b,me);
+  const captured=new Set(); let firstCap=0;
+  const moves=path.map(s=>toIdx(b,s));
+  let mineEnd=null, ataris=null;
+  for(let j=0;j<moves.length;j++){const r=b.play(moves[j]); if(!r.ok) break; if(j%2===0){ (r.captured||[]).forEach(s=>{ if(start.grid[s]===op) captured.add(s)}); mineEnd=b.snapshot(); if(!ataris){const a=groupsOf(b,op).filter(g=>g.libs.size===1&&g.stones.some(t=>start.grid[t]===op)); if(a.length) ataris=a;}}}
+  const end=new G.Board(problem.size); end.restore(mineEnd||start);
+  // 1) 取る
+  if(captured.size){
+    const tg=op0.filter(g=>g.stones.some(s=>captured.has(s)));
+    const ring=new Set(); tg.forEach(g=>g.stones.forEach(s=>ring.add(s)));
+    if(moves.length===1 && tg.every(g=>g.libs.size===1)) return {ring,text:'あかい わの '+opName+'い いしは アタリ。あと 1かしょで とれるよ'};
+    if(moves.length===1) return {ring,text:'あかい わの '+opName+'い いしを とろう'};
+    return {ring,text:'あかい わの '+opName+'い いしを とる ほうほうを かんがえよう'};
+  }
+  // 2) アタリにする（最後に 相手の石が アタリ）
+  const opEnd=ataris||[];
+  // 3) 自分の石を たすける（はじめ あぶない → おわり ふえた）
+  const weak=my0.filter(g=>g.libs.size<=2);
+  const saved=weak.filter(g=>{const s=g.stones[0]; if(end.grid[s]!==me) return false; return end.group(s).libs.size>g.libs.size;});
+  const rescued=saved.filter(g=>g.libs.size===1);
+  if(rescued.length){const ring=new Set();rescued.forEach(g=>g.stones.forEach(s=>ring.add(s)));return {ring,text:'あかい わの '+myName+'い いしが アタリ。たすけよう'};}
+  if(opEnd.length){const ring=new Set();opEnd.forEach(g=>{const s0=g.stones.filter(s=>start.grid[s]===op);const g0=op0.find(h=>h.stones.includes(s0[0]));(g0?g0.stones:s0).forEach(s=>ring.add(s));});
+    return {ring,text:'あかい わの '+opName+'い いしを アタリに しよう'};}
+  // 4) つなぐ：はじめ別れていた 自分の石が 1つに なる
+  const first=moves[0], fb=new G.Board(problem.size); fb.restore(start); fb.play(first);
+  const joined=my0.filter(g=>fb.grid[g.stones[0]]===me && fb.group(g.stones[0]).stones.includes(first));
+  if(joined.length>=2){const ring=new Set();joined.forEach(g=>g.stones.forEach(s=>ring.add(s)));return {ring,text:'あかい わの '+myName+'い いしが きられないように しよう'};}
+  if(saved.length){const ring=new Set();saved.forEach(g=>g.stones.forEach(s=>ring.add(s)));return {ring,text:'あかい わの '+myName+'い いしを つよく しよう'};}
+  // 5) せめる：初手で ダメが へる 相手の石
+  const hit=op0.filter(g=>g.libs.has(first));
+  if(hit.length){const ring=new Set();hit.forEach(g=>g.stones.forEach(s=>ring.add(s)));return {ring,text:'あかい わの '+opName+'い いしを せめよう'};}
+  const near=my0.filter(g=>g.libs.has(first));
+  if(near.length){const ring=new Set();near.forEach(g=>g.stones.forEach(s=>ring.add(s)));return {ring,text:'あかい わの '+myName+'い いしを つよく しよう'};}
+  const around=new Set(b.neighbors(first)); b.neighbors(first).forEach(q=>b.neighbors(q).forEach(r=>around.add(r)));
+  const near2=my0.filter(g=>g.stones.some(s=>around.has(s)));
+  if(near2.length){const ring=new Set();near2.forEach(g=>g.stones.forEach(s=>ring.add(s)));return {ring,text:'あかい わの '+myName+'い いしを つよく しよう'};}
+  const hit2=op0.filter(g=>g.stones.some(s=>around.has(s)));
+  if(hit2.length){const ring=new Set();hit2.forEach(g=>g.stones.forEach(s=>ring.add(s)));return {ring,text:'あかい わの '+opName+'い いしを せめよう'};}
+  return null;
+}
 
   function answerPath(tree) {
     for (const k in tree) if (tree[k].ok) return [k];
