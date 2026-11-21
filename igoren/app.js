@@ -542,7 +542,31 @@
   // ヒント：問題の分類ではなく、こたえの手順を盤で うごかして きめる。
   // 取る・アタリにする・たすける・つなぐ・せめる のどれかを見て、ねらう石だけに あかい わを つける。
   // A・B から えらぶ問題は、わを つけると こたえが わかるので ことばだけ。
+  // 変更：問題データに hintText（文）・hintMarks（輪をつける座標の配列）があれば、それを優先する。
+  // 片方だけのときは、もう片方を自動生成で補う。どちらも無ければ従来どおり自動生成。
   function makeHint(problem) {
+    const text = (typeof problem.hintText === 'string' && problem.hintText.trim()) ? problem.hintText : null;
+    const marks = hintMarksRing(problem);
+    if (!text && !marks) return autoHint(problem);
+    if (text && marks) return { ring: marks, text };
+    const auto = autoHint(problem);
+    return { ring: marks || auto.ring, text: text || auto.text };
+  }
+  // hintMarks を あかい わ（盤の番号の Set）に する。盤の外・形のおかしい座標は すてる。1つも残らなければ null。
+  function hintMarksRing(problem) {
+    if (!Array.isArray(problem.hintMarks) || !problem.hintMarks.length) return null;
+    const n = problem.size;
+    const b = new GoEngine.Board(n);
+    const ring = new Set();
+    for (const s of problem.hintMarks) {
+      if (typeof s !== 'string' || s.length !== 2) continue;
+      const x = s.charCodeAt(0) - 97, y = s.charCodeAt(1) - 97;
+      if (x < 0 || y < 0 || x >= n || y >= n) continue;
+      ring.add(toIdx(b, s));
+    }
+    return ring.size ? ring : null;
+  }
+  function autoHint(problem) {
     const G = GoEngine;
     const h = hintFor(problem);
     if (h) return h;
